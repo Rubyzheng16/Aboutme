@@ -189,42 +189,17 @@ export default function App() {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.4 }}
                     >
-                      {/* LEFT SIDEBAR: Context Info */}
-                      <div className="w-full md:w-[30%] h-auto md:h-screen sticky top-0 p-10 md:p-24 flex flex-col z-20 overflow-hidden border-b md:border-b-0 md:border-r border-black/5">
+                      {/* LEFT PANEL: Empty Symmetrical Page */}
+                      <div className="w-full md:w-1/2 h-auto md:h-screen sticky top-0 z-20 overflow-hidden border-b md:border-b-0 md:border-r border-black/10">
                         <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                          <div className="space-y-6">
-                            <h4 className="text-[10px] font-mono font-black uppercase tracking-[0.8em] text-black/20">FRAGMENT // ARCHIVE_SYS</h4>
-                            <h2 className="text-6xl md:text-9xl font-serif italic tracking-tighter text-black/80 leading-tight">Fr<span className="font-bold">agn</span></h2>
-                            
-                            <div className="pt-24">
-                               <DraggableNote 
-                                  id="note-modal"
-                                  text="[System Log] Record retrieved. Displaying recovered data for session BUREAU_ZH//17B."
-                                  color="bg-[#FFF9C4]"
-                                  initPos={{ x: 0, y: 0 }}
-                                  rotate={-2}
-                               />
-                            </div>
-                          </div>
-
-                          <div className="pt-12 border-t border-black/10">
-                            <div className="flex justify-between items-end">
-                              <div className="space-y-1">
-                                <span className="text-[8px] font-mono font-bold tracking-[0.5em] opacity-20 block">TIMESTAMP_V</span>
-                                <span className="text-xs font-mono font-bold text-black/40 uppercase">1966.03.18</span>
-                              </div>
-                              <div className="text-right">
-                                <span className="text-[8px] font-mono font-bold tracking-[0.5em] opacity-20 block">RECORD_ID</span>
-                                <span className="text-xs font-mono font-bold text-black/40">B_ZH_0{folderIdx+1}</span>
-                              </div>
-                            </div>
-                          </div>
+                        {/* Decorative binder holes along the spine (right edge of left panel) */}
+                        <div className="absolute right-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
+                           {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
                         </div>
                       </div>
 
                       {/* RIGHT CONTENT: Infinite Roll Portal */}
-                      <div className="flex-1 bg-white relative flex flex-col z-10 document-infinite-roll">
+                      <div className="w-full md:w-1/2 bg-white relative flex flex-col z-10 document-infinite-roll border-l border-black/5 shadow-[-10px_0_30px_rgba(0,0,0,0.05)]">
                         {/* Decorative binder holes - now running full length */}
                         <div className="absolute left-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
                            {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
