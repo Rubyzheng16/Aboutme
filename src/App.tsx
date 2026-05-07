@@ -50,25 +50,25 @@ export default function App() {
             <span className="w-12 h-[1px] bg-archive-border/30" />
           </div>
           <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter mb-4 uppercase">
-            个人简历
+            档案：郑好
           </h1>
           <p className="text-xs md:text-sm font-mono text-archive-border/60 uppercase tracking-widest leading-relaxed">
-            TEL: {resumeData.phone} // LOC: {resumeData.location}<br />
-            MAIL: {resumeData.email} // STATUS: ACTIVE
+            SYSTEM_ACCESS: GRANTED // ID: ZH_2026<br />
+            STATUS: ACTIVE // ROLE: FRONTEND_DEV
           </p>
         </motion.header>
       )}
 
       {/* Main Stack Container - Scaled to 1/3 height roughly */}
-      <div className="relative w-full max-w-5xl h-[500px] md:h-[650px] flex items-center justify-center [perspective:2000px]">
+      <div className="relative w-full max-w-5xl h-[450px] md:h-[600px] flex items-center justify-center">
         <AnimatePresence mode="wait">
           {!activeFolderId ? (
             <motion.div 
               key="stack"
-              className="relative w-full h-full [transform-style:preserve-3d]"
-              initial={{ opacity: 0, scale: 0.95, rotateX: 20 }}
-              animate={{ opacity: 1, scale: 1, rotateX: 15 }}
-              exit={{ opacity: 0, scale: 1.1, rotateX: 0 }}
+              className="relative w-full h-full"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.1 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               {FOLDERS.map((folder, index) => (
@@ -76,23 +76,22 @@ export default function App() {
                   key={folder.id}
                   layoutId={folder.id}
                   onClick={() => setActiveFolderId(folder.id)}
-                  className="absolute w-80 md:w-[650px] cursor-pointer group left-1/2 -ml-40 md:-ml-[325px]"
+                  className="absolute w-80 md:w-[600px] cursor-pointer group left-1/2 -ml-40 md:-ml-[300px]"
                   style={{
-                    zIndex: index, // Back to index: 0 is furthest back
-                    top: `${index * 40}px`, // Increased spacing to see more of the folders behind
+                    zIndex: index + 1,
+                    top: `${index * 20}px`,
                   }}
                   whileHover={{ 
-                    y: -40,
-                    z: 50,
-                    transition: { duration: 0.3, ease: "easeOut" } 
+                    y: -60,
+                    transition: { duration: 0.4, ease: "circOut" } 
                   }}
                 >
                   {/* Staggered Folder Tab */}
-                  <div className={`w-32 md:w-56 h-10 ${folder.color} border-t border-l border-r border-archive-border/50 folder-tab ${folder.tabOffset} text-[10px] md:text-sm flex items-center px-4 md:px-8 font-mono text-archive-border/80 font-bold uppercase transition-colors group-hover:brightness-95`}>
-                    {folder.label.split('_')[1]}
+                  <div className={`w-32 md:w-48 h-8 ${folder.color} border-t border-l border-r border-archive-border/50 folder-tab ${folder.tabOffset} text-[10px] md:text-xs flex items-center px-4 md:px-6 font-mono text-archive-border/80 font-bold uppercase transition-colors group-hover:brightness-95`}>
+                    {folder.id}
                   </div>
                   {/* Folder Body */}
-                  <div className={`w-full h-72 md:h-[450px] ${folder.color} border border-archive-border/50 shadow-[10px_10px_20px_rgba(0,0,0,0.1)] p-8 md:p-14 flex flex-col justify-between transition-all duration-300 ${folder.hoverColor}`}>
+                  <div className={`w-full h-64 md:h-96 ${folder.color} border border-archive-border/50 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] p-8 md:p-12 flex flex-col justify-between transition-all duration-300 ${folder.hoverColor}`}>
                     <div className="flex items-start justify-between">
                       <div className="space-y-3">
                         <p className="text-[10px] md:text-xs font-mono opacity-60 uppercase tracking-widest border-b border-archive-border/20 pb-2">Category: 秘密档案</p>
