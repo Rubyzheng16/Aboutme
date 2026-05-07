@@ -24,10 +24,10 @@ import { resumeData, hobbyData } from './data';
 type FolderId = 'PROFILE_EDU' | 'EXPERIENCE' | 'PROJECTS' | 'HOBBIES';
 
 const FOLDERS: { id: FolderId; label: string; color: string; hoverColor: string; tabOffset: string; icon: any }[] = [
-  { id: 'PROFILE_EDU', label: '01_简历概览', color: 'bg-[#E3D9C6]', hoverColor: 'group-hover:bg-[#D4C4A8]', tabOffset: 'ml-4', icon: FileText },
-  { id: 'EXPERIENCE', label: '02_实习经历', color: 'bg-[#D6E0D4]', hoverColor: 'group-hover:bg-[#BACCB7]', tabOffset: 'ml-32', icon: Briefcase },
-  { id: 'PROJECTS', label: '03_作品存档', color: 'bg-[#D4DEE5]', hoverColor: 'group-hover:bg-[#B8C8D4]', tabOffset: 'ml-64', icon: Layers },
-  { id: 'HOBBIES', label: '04_兴趣爱好', color: 'bg-[#E5D4DE]', hoverColor: 'group-hover:bg-[#D4B8C8]', tabOffset: 'ml-12 md:ml-96', icon: Heart },
+  { id: 'PROFILE_EDU', label: '01_概览', color: 'bg-[#E3D9C6]', hoverColor: 'group-hover:bg-[#D4C4A8]', tabOffset: 'ml-2 md:ml-4', icon: FileText },
+  { id: 'EXPERIENCE', label: '02_经历', color: 'bg-[#D6E0D4]', hoverColor: 'group-hover:bg-[#BACCB7]', tabOffset: 'ml-20 md:ml-32', icon: Briefcase },
+  { id: 'PROJECTS', label: '03_作品', color: 'bg-[#D4DEE5]', hoverColor: 'group-hover:bg-[#B8C8D4]', tabOffset: 'ml-[144px] md:ml-64', icon: Layers },
+  { id: 'HOBBIES', label: '04_爱好', color: 'bg-[#E5D4DE]', hoverColor: 'group-hover:bg-[#D4B8C8]', tabOffset: 'ml-[220px] md:ml-96', icon: Heart },
 ];
 
 const HobbyIcons: Record<string, any> = { Megaphone, Music, Palette, Camera };
@@ -42,25 +42,25 @@ export default function App() {
         <motion.header 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-12 h-[1px] bg-archive-border/30" />
-            <span className="text-xs font-mono uppercase tracking-[0.2em] text-archive-border/60">Professional Personal Archive</span>
+            <span className="text-xs font-mono uppercase tracking-[0.2em] text-archive-border/60 text-[10px] md:text-xs">Professional Personal Archive</span>
             <span className="w-12 h-[1px] bg-archive-border/30" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter mb-4 uppercase">
-            档案：郑好
+          <h1 className="text-4xl md:text-7xl font-semibold tracking-tighter mb-4 uppercase">
+            郑好个人简历
           </h1>
-          <p className="text-xs md:text-sm font-mono text-archive-border/60 uppercase tracking-widest leading-relaxed">
-            SYSTEM_ACCESS: GRANTED // ID: ZH_2026<br />
-            STATUS: ACTIVE // ROLE: FRONTEND_DEV
+          <p className="text-[10px] md:text-sm font-mono text-archive-border/60 uppercase tracking-widest leading-relaxed">
+            {resumeData.location} // {resumeData.phone}<br />
+            {resumeData.email}
           </p>
         </motion.header>
       )}
 
-      {/* Main Stack Container - Scaled to 1/3 height roughly */}
-      <div className="relative w-full max-w-5xl h-[450px] md:h-[600px] flex items-center justify-center">
+      {/* Main Stack Container */}
+      <div className="relative w-full max-w-5xl h-[450px] md:h-[650px] flex items-center justify-center">
         <AnimatePresence mode="wait">
           {!activeFolderId ? (
             <motion.div 
@@ -76,22 +76,22 @@ export default function App() {
                   key={folder.id}
                   layoutId={folder.id}
                   onClick={() => setActiveFolderId(folder.id)}
-                  className="absolute w-80 md:w-[600px] cursor-pointer group left-1/2 -ml-40 md:-ml-[300px]"
+                  className="absolute w-[92%] md:w-[600px] cursor-pointer group left-1/2 -ml-[46%] md:-ml-[300px]"
                   style={{
-                    zIndex: index + 1,
-                    top: `${index * 20}px`,
+                    zIndex: FOLDERS.length - index,
+                    top: `${(FOLDERS.length - 1 - index) * (window.innerWidth < 768 ? 40 : 60)}px`,
                   }}
                   whileHover={{ 
-                    y: -60,
+                    y: window.innerWidth < 768 ? -80 : -140,
                     transition: { duration: 0.4, ease: "circOut" } 
                   }}
                 >
                   {/* Staggered Folder Tab */}
-                  <div className={`w-32 md:w-48 h-8 ${folder.color} border-t border-l border-r border-archive-border/50 folder-tab ${folder.tabOffset} text-[10px] md:text-xs flex items-center px-4 md:px-6 font-mono text-archive-border/80 font-bold uppercase transition-colors group-hover:brightness-95`}>
-                    {folder.id}
+                  <div className={`w-24 md:w-48 h-8 ${folder.color} border-t border-l border-r border-archive-border/50 folder-tab ${folder.tabOffset} text-[9px] md:text-xs flex items-center px-3 md:px-6 font-mono text-archive-border/80 font-bold uppercase transition-colors group-hover:brightness-95`}>
+                    {folder.label}
                   </div>
                   {/* Folder Body */}
-                  <div className={`w-full h-64 md:h-96 ${folder.color} border border-archive-border/50 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] p-8 md:p-12 flex flex-col justify-between transition-all duration-300 ${folder.hoverColor}`}>
+                  <div className={`w-full h-56 md:h-96 ${folder.color} border border-archive-border/50 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] p-6 md:p-12 flex flex-col justify-between transition-all duration-300 ${folder.hoverColor}`}>
                     <div className="flex items-start justify-between">
                       <div className="space-y-3">
                         <p className="text-[10px] md:text-xs font-mono opacity-60 uppercase tracking-widest border-b border-archive-border/20 pb-2">Category: 秘密档案</p>
