@@ -188,15 +188,37 @@ export default function App() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.4 }}
+                      style={{ perspective: "2500px" }}
                     >
-                      {/* LEFT PANEL: Empty Symmetrical Page */}
-                      <div className="w-full md:w-1/2 h-auto md:h-screen sticky top-0 z-20 overflow-hidden border-b md:border-b-0 md:border-r border-black/10">
+                      {/* LEFT PANEL: Flip Animation Blank Page */}
+                      <motion.div 
+                        initial={{ rotateY: 80, originX: "100%" }}
+                        animate={{ rotateY: 0 }}
+                        transition={{ 
+                          duration: 1.2, 
+                          ease: [0.22, 1, 0.36, 1],
+                          delay: 0.1 
+                        }}
+                        className="w-full md:w-1/2 h-auto md:h-screen sticky top-0 z-20 overflow-hidden border-b md:border-b-0 md:border-r border-black/10 shadow-[20px_0_50px_rgba(0,0,0,0.2)] transform-gpu"
+                      >
                         <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+                        
+                        {/* Spine shadow during flip */}
+                        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black/20 to-transparent z-30" />
+                        
                         {/* Decorative binder holes along the spine (right edge of left panel) */}
                         <div className="absolute right-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
                            {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
                         </div>
-                      </div>
+
+                        {/* Page highlights for realism during the turn */}
+                        <motion.div 
+                          initial={{ opacity: 0.4 }}
+                          animate={{ opacity: 0 }}
+                          transition={{ duration: 1.2, delay: 0.1 }}
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
+                        />
+                      </motion.div>
 
                       {/* RIGHT CONTENT: Infinite Roll Portal */}
                       <div className="w-full md:w-1/2 bg-white relative flex flex-col z-10 document-infinite-roll border-l border-black/5 shadow-[-10px_0_30px_rgba(0,0,0,0.05)]">
