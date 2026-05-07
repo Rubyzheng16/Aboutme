@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Github, 
@@ -35,6 +35,19 @@ const HobbyIcons: Record<string, any> = { Megaphone, Music, Palette, Camera };
 export default function App() {
   const [activeFolderId, setActiveFolderId] = useState<FolderId | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [detailPhase, setDetailPhase] = useState<'extract' | 'flip' | 'fixed'>('extract');
+
+  useEffect(() => {
+    if (!activeFolderId) return;
+    setDetailPhase('extract');
+    const flipTimer = window.setTimeout(() => setDetailPhase('flip'), 260);
+    const fixedTimer = window.setTimeout(() => setDetailPhase('fixed'), 860);
+
+    return () => {
+      window.clearTimeout(flipTimer);
+      window.clearTimeout(fixedTimer);
+    };
+  }, [activeFolderId]);
 
   const getFolderTop = (index: number) => {
     const baseGap = window.innerWidth < 768 ? 45 : 65;
@@ -160,7 +173,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-start justify-center bg-[#1a1a1a]/98 overflow-y-auto custom-scrollbar-minimal pt-10 md:pt-20"
+              className="fixed inset-0 z-50 flex items-start justify-center bg-[#1a1a1a]/98 overflow-hidden pt-10 md:pt-20"
             >
               <div className="relative w-full max-w-7xl flex flex-col items-center">
                 
@@ -176,101 +189,72 @@ export default function App() {
                   <X size={28} strokeWidth={1} />
                 </motion.button>
 
-                {/* The Dossier Folder - Infinite Vertical Layout */}
-                {(() => {
+                {detailPhase !== 'extract' && <DossierPage activeFolderId={activeFolderId} />}
+                <PageFlipTransition detailPhase={detailPhase} activeFolderId={activeFolderId} />
+
+                {/* Disabled: previous fixed reader experiment kept out of the render path. */}
+                {false && (() => {
                   const currentFolder = FOLDERS.find(f => f.id === activeFolderId);
-                  const folderIdx = FOLDERS.findIndex(f => f.id === activeFolderId);
+                  const currentFolderLabel = currentFolder?.label?.replace('_', ' ') ?? 'Document';
                   return (
-                    <motion.div 
+                    <motion.div
                       layoutId={activeFolderId}
-                      className={`relative w-full md:w-[100%] min-h-screen ${currentFolder?.color || 'bg-[#B08D57]'} flex flex-col md:flex-row z-50 origin-center paper-grain overflow-visible`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      style={{ perspective: "2500px" }}
+                      className="detail-shell px-3 md:px-8"
+                      initial={{ opacity: 0, y: 90, scale: 0.76 }}
+                      animate={{
+                        opacity: 1,
+                        y: detailPhase === 'extract' ? 42 : 0,
+                        scale: detailPhase === 'extract' ? 0.84 : detailPhase === 'flip' ? 0.92 : 1,
+                      }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      {/* LEFT PANEL: Flip Animation Blank Page */}
-                      <motion.div 
-                        initial={{ rotateY: 80, originX: "100%" }}
-                        animate={{ rotateY: 0 }}
-                        transition={{ 
-                          duration: 1.2, 
-                          ease: [0.22, 1, 0.36, 1],
-                          delay: 0.1 
-                        }}
-                        className="w-full md:w-1/2 h-auto md:h-screen sticky top-0 z-20 overflow-hidden border-b md:border-b-0 md:border-r border-black/10 shadow-[20px_0_50px_rgba(0,0,0,0.2)] transform-gpu"
-                      >
-                        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-                        
-                        {/* Spine shadow during flip */}
-                        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black/20 to-transparent z-30" />
-                        
-                        {/* Decorative binder holes along the spine (right edge of left panel) */}
-                        <div className="absolute right-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
-                           {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
-                        </div>
+                      <div key={detailPhase} className={`detail-fixed-board ${detailPhase === 'fixed' ? 'detail-fixed-board--fixed' : ''}`}>
+                        {detailPhase === 'fixed' ? (
+                          <>
+                            <div className="detail-left-empty" />
+                            <div className="detail-right-scroll custom-scrollbar-minimal">
+                              <div className="mb-10 md:mb-14">
+                                <p className="text-xs font-mono tracking-[0.34em] uppercase text-black/40 mb-3">File {currentFolderLabel}</p>
+                                <h2 className="text-4xl md:text-6xl font-serif italic tracking-tight mb-3">Unverified</h2>
+                                <p className="text-black/55 leading-relaxed">右页展示简历内容，左页保持空白。翻页结束后进入固定阅读模式，鼠标滚动可继续查看下方内容。</p>
+                              </div>
 
-                        {/* Page highlights for realism during the turn */}
-                        <motion.div 
-                          initial={{ opacity: 0.4 }}
-                          animate={{ opacity: 0 }}
-                          transition={{ duration: 1.2, delay: 0.1 }}
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
-                        />
-                      </motion.div>
-
-                      {/* RIGHT CONTENT: Infinite Roll Portal */}
-                      <div className="w-full md:w-1/2 bg-white relative flex flex-col z-10 document-infinite-roll border-l border-black/5 shadow-[-10px_0_30px_rgba(0,0,0,0.05)]">
-                        {/* Decorative binder holes - now running full length */}
-                        <div className="absolute left-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
-                           {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
-                        </div>
-
-                        <div className="p-12 md:p-32 space-y-48">
-                          {/* Main Title Section */}
-                          <div className="max-w-3xl">
-                             <div className="flex items-center gap-6 mb-12 opacity-20">
-                                <div className="w-16 h-[2px] bg-black" />
-                                <span className="text-xs font-mono tracking-[0.5em]">CERTIFIED_DOC</span>
-                             </div>
-                             <h3 className="text-7xl md:text-[120px] font-serif italic tracking-tighter text-black/95 mb-16 capitalize leading-[0.8]">
-                                {currentFolder?.label.split('_')[1] || currentFolder?.label}
-                             </h3>
-                             <p className="text-2xl md:text-3xl text-black/40 leading-relaxed font-serif max-w-2xl">
-                                Part of the unindexed materials recovered from the {currentFolder?.label.split('_')[1]} bureau. Authenticated via standard protocols.
-                             </p>
+                              <AnimatePresence mode="wait">
+                                <motion.div
+                                  key={activeFolderId}
+                                  initial={{ opacity: 0, y: 24 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                                  className="resume-flow"
+                                >
+                                  {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
+                                  {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
+                                  {activeFolderId === 'PROJECTS' && <ProjectsView />}
+                                  {activeFolderId === 'HOBBIES' && <HobbiesView />}
+                                </motion.div>
+                              </AnimatePresence>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="pageflip-host">
+                            <div className="pageflip-page pageflip-page--blank" />
+                            <div className="pageflip-page pageflip-page--resume custom-scrollbar-minimal">
+                              <div className="mb-10 md:mb-14">
+                                <p className="text-xs font-mono tracking-[0.34em] uppercase text-black/40 mb-3">File {currentFolderLabel}</p>
+                                <h2 className="text-4xl md:text-6xl font-serif italic tracking-tight mb-3">Unverified</h2>
+                                <p className="text-black/55 leading-relaxed">翻页阶段：左页为空白纸张，右页为简历内容。</p>
+                              </div>
+                              <div className="resume-flow">
+                                {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
+                                {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
+                                {activeFolderId === 'PROJECTS' && <ProjectsView />}
+                                {activeFolderId === 'HOBBIES' && <HobbiesView />}
+                              </div>
+                            </div>
                           </div>
-
-                          <div className="w-full h-px bg-black/5" />
-
-                          {/* Content Section */}
-                          <div className="min-h-screen">
-                            <AnimatePresence mode="wait">
-                               <motion.div
-                                 key={activeFolderId}
-                                 initial={{ opacity: 0, y: 50 }}
-                                 animate={{ opacity: 1, y: 0 }}
-                                 exit={{ opacity: 0 }}
-                                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                               >
-                                 {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
-                                 {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
-                                 {activeFolderId === 'PROJECTS' && <ProjectsView />}
-                                 {activeFolderId === 'HOBBIES' && <HobbiesView />}
-                               </motion.div>
-                            </AnimatePresence>
-                          </div>
-
-                          {/* Aesthetic Terminal Section */}
-                          <div className="pt-32 border-t-4 border-double border-black/10 flex justify-between items-baseline opacity-30 font-mono text-[9px] font-black uppercase tracking-[0.5em]">
-                             <div className="flex gap-12">
-                                <span>Verified_Record</span>
-                                <span>Bureau_ZH</span>
-                             </div>
-                             <span>End_Of_Document</span>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </motion.div>
                   );
@@ -345,6 +329,186 @@ function DetailItem({ icon: Icon, label, value }: any) {
       </div>
       <span className="text-xs font-semibold">{value}</span>
     </div>
+  );
+}
+
+function PageFlipTransition({
+  detailPhase,
+  activeFolderId,
+}: {
+  detailPhase: 'extract' | 'flip' | 'fixed';
+  activeFolderId: FolderId;
+}) {
+  const isOpen = detailPhase === 'flip';
+  const folder = FOLDERS.find(f => f.id === activeFolderId) ?? FOLDERS[0];
+
+  return (
+    <AnimatePresence>
+      {detailPhase !== 'fixed' && (
+        <motion.div
+          className="book-open-transition-overlay"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.01 }}
+        >
+          <motion.div
+            className="book-open-stage"
+            initial={{ y: 40, scale: 0.995 }}
+            animate={{
+              y: 0,
+              scale: 1,
+            }}
+            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <motion.div
+              className="book-open-spread"
+            >
+              <motion.div
+                className="book-open-right-cover"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: isOpen ? 1 : 0 }}
+                transition={{ duration: 0.01 }}
+              >
+                <PageIntro activeFolderId={activeFolderId} className="book-open-right-intro" />
+              </motion.div>
+              <motion.div
+                className={`book-open-turning-cover ${folder.color}`}
+                animate={{
+                  width: "50%",
+                  left: isOpen ? "calc(50% - 2px)" : "50%",
+                  rotateY: isOpen ? -156 : 0,
+                }}
+                transition={{ duration: 0.58, ease: [0.18, 0.92, 0.2, 1] }}
+              >
+                <div className={`book-open-cover-front ${folder.color}`}>
+                  <div className={`book-open-tab ${folder.color} folder-tab`}>
+                    {folder.label}
+                  </div>
+                </div>
+                <div className={`book-open-cover-back ${folder.color}`}>
+                  <div className={`book-open-tab ${folder.color} folder-tab`}>
+                    {folder.label}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function PageIntro({ activeFolderId, className = "" }: { activeFolderId: FolderId; className?: string }) {
+  const currentFolder = FOLDERS.find(f => f.id === activeFolderId);
+  const title = currentFolder?.label.split('_')[1] || currentFolder?.label;
+
+  return (
+    <div className={className}>
+      <div className="flex items-center gap-6 mb-12 opacity-20">
+        <div className="w-16 h-[2px] bg-black" />
+        <span className="text-xs font-mono tracking-[0.5em]">CERTIFIED_DOC</span>
+      </div>
+      <h3 className="text-7xl md:text-[120px] font-serif italic tracking-tighter text-black/95 mb-16 capitalize leading-[0.8]">
+        {title}
+      </h3>
+      <p className="text-2xl md:text-3xl text-black/40 leading-relaxed font-serif max-w-2xl">
+        Part of the unindexed materials recovered from the {title} bureau. Authenticated via standard protocols.
+      </p>
+    </div>
+  );
+}
+
+function DossierPage({ activeFolderId }: { activeFolderId: FolderId }) {
+  const currentFolder = FOLDERS.find(f => f.id === activeFolderId);
+
+  return (
+    <motion.div
+      layoutId={activeFolderId}
+      className={`relative w-full md:w-[100%] h-[calc(100vh-2.5rem)] md:h-[calc(100vh-5rem)] ${currentFolder?.color || 'bg-[#B08D57]'} flex flex-col md:flex-row z-50 origin-center paper-grain overflow-visible`}
+      initial={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.12 }}
+      style={{ perspective: "2500px" }}
+    >
+      {/* LEFT PANEL: Flip Animation Blank Page */}
+      <motion.div
+        initial={{ rotateY: 0, originX: "100%" }}
+        animate={{ rotateY: 0 }}
+        transition={{
+          duration: 1.2,
+          ease: [0.22, 1, 0.36, 1],
+          delay: 0.1
+        }}
+        className="w-full md:w-1/2 h-[45vh] md:h-full shrink-0 sticky top-0 z-20 overflow-visible border-b md:border-b-0 md:border-r border-black/10 shadow-[20px_0_50px_rgba(0,0,0,0.2)] transform-gpu"
+      >
+        <div className={`${currentFolder?.color || 'bg-[#B08D57]'} folder-tab final-folder-tab`}>
+          {currentFolder?.label}
+        </div>
+        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black/20 to-transparent z-30" />
+        <div className="absolute right-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
+          {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
+        </div>
+        <motion.div
+          initial={{ opacity: 0.4 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1.2, delay: 0.1 }}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
+        />
+      </motion.div>
+
+      {/* RIGHT CONTENT: Infinite Roll Portal */}
+      <div className="w-full md:w-1/2 h-full overflow-y-auto custom-scrollbar-minimal bg-white relative flex flex-col z-10 document-infinite-roll border-l border-black/5 shadow-[-10px_0_30px_rgba(0,0,0,0.05)]">
+        <div className="absolute left-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
+          {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
+        </div>
+
+        <div className="p-12 md:p-32 space-y-48">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-6 mb-12 opacity-20">
+              <div className="w-16 h-[2px] bg-black" />
+              <span className="text-xs font-mono tracking-[0.5em]">CERTIFIED_DOC</span>
+            </div>
+            <h3 className="text-7xl md:text-[120px] font-serif italic tracking-tighter text-black/95 mb-16 capitalize leading-[0.8]">
+              {currentFolder?.label.split('_')[1] || currentFolder?.label}
+            </h3>
+            <p className="text-2xl md:text-3xl text-black/40 leading-relaxed font-serif max-w-2xl">
+              Part of the unindexed materials recovered from the {currentFolder?.label.split('_')[1]} bureau. Authenticated via standard protocols.
+            </p>
+          </div>
+
+          <div className="w-full h-px bg-black/5" />
+
+          <div className="min-h-screen">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeFolderId}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
+                {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
+                {activeFolderId === 'PROJECTS' && <ProjectsView />}
+                {activeFolderId === 'HOBBIES' && <HobbiesView />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="pt-32 border-t-4 border-double border-black/10 flex justify-between items-baseline opacity-30 font-mono text-[9px] font-black uppercase tracking-[0.5em]">
+            <div className="flex gap-12">
+              <span>Verified_Record</span>
+              <span>Bureau_ZH</span>
+            </div>
+            <span>End_Of_Document</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

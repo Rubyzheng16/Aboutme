@@ -110,3 +110,158 @@
   transform: translateZ(-10px);
   filter: blur(2px);
 }
+
+.book-open-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  pointer-events: none;
+  background: #1a1a1a;
+  overflow: hidden;
+  padding-top: 2.5rem;
+}
+
+.book-open-stage {
+  width: 100%;
+  max-width: 80rem;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 2400px;
+}
+
+.book-open-spread {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+}
+
+.book-open-right-cover,
+.book-open-turning-cover {
+  position: absolute;
+  top: 0;
+  width: calc(50% + 1px);
+  height: 100%;
+}
+
+.book-open-right-cover {
+  right: -1px;
+  background-color: #ffffff;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 12px 0 28px rgba(0, 0, 0, 0.028);
+}
+
+.book-open-right-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 8rem 4rem;
+  color: #222222;
+  pointer-events: none;
+}
+
+.book-open-turning-cover {
+  z-index: 2;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.book-open-cover-front,
+.book-open-cover-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  overflow: visible;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  will-change: transform;
+}
+
+.book-open-cover-front {
+  box-shadow: inset -14px 0 28px rgba(0, 0, 0, 0.06), inset 8px 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.book-open-cover-front::before,
+.book-open-cover-back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.14), transparent 38%, rgba(0, 0, 0, 0.035) 68%, transparent 86%);
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+.book-open-cover-front::after,
+.book-open-cover-back::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 22px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.035), transparent);
+  pointer-events: none;
+}
+
+.book-open-cover-back {
+  transform: rotateY(180deg);
+  box-shadow: inset 12px 0 28px rgba(0, 0, 0, 0.055), inset -8px 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.final-folder-tab {
+  position: absolute;
+  top: -44px;
+  left: 44px;
+  width: min(260px, 44%);
+  height: 44px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 28px;
+  font-size: 12px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.55);
+  z-index: 60;
+}
+
+@media (min-width: 768px) {
+  .book-open-transition-overlay {
+    padding-top: 5rem;
+  }
+}
+
+.book-open-tab {
+  position: absolute;
+  top: -44px;
+  left: 38px;
+  width: min(230px, 42%);
+  height: 44px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 28px;
+  font-size: 12px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  overflow: hidden;
+  z-index: 4;
+}
