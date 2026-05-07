@@ -64,14 +64,15 @@ export default function App() {
 
       {/* Main Stack Container */}
       <div className="relative w-full max-w-5xl h-[450px] md:h-[650px] flex items-center justify-center">
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {!activeFolderId ? (
             <motion.div 
               key="stack"
               className="relative w-full h-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
               {FOLDERS.map((folder, index) => (
                 <motion.div
@@ -84,8 +85,8 @@ export default function App() {
                     top: `${(FOLDERS.length - 1 - index) * (window.innerWidth < 768 ? 40 : 60)}px`,
                   }}
                   whileHover={{ 
-                    y: window.innerWidth < 768 ? -100 : -160,
-                    transition: { duration: 0.4, ease: "circOut" } 
+                    y: window.innerWidth < 768 ? -80 : -120,
+                    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } 
                   }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -119,160 +120,122 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-archive-bg/95 backdrop-blur-sm px-4 py-8 md:p-12 overflow-hidden"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a]/95 backdrop-blur-md p-2 md:p-8 overflow-hidden"
             >
-              <div className="relative w-full max-w-7xl h-full flex flex-col items-center">
+              <div className="relative w-full max-w-4xl h-full flex flex-col items-center justify-center perspective-[2000px]">
                 
-                {/* Fragment Style Header */}
-                <motion.div 
-                  initial={{ opacity: 0, y: -20 }}
+                {/* Close Button - Floats above */}
+                <motion.button 
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="w-full flex justify-between items-end mb-8 border-b border-archive-border/10 pb-4"
+                  transition={{ delay: 0.6 }}
+                  onClick={() => setActiveFolderId(null)}
+                  className="absolute -top-12 right-0 p-3 bg-white border border-archive-border shadow-lg flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] font-bold hover:bg-red-50 transition-colors z-[70]"
                 >
-                  <div className="space-y-1">
-                    <h2 className="text-4xl md:text-6xl font-serif tracking-tighter font-light">
-                      Fragment <span className="font-bold italic">17B</span>
-                    </h2>
-                    <p className="text-[10px] font-mono opacity-40 uppercase tracking-widest">Unindexed Materials / Professional Records</p>
-                  </div>
-                  <div className="text-right hidden md:block">
-                    <p className="text-[10px] font-mono opacity-50 uppercase mb-1">Filed: Archive_ZH</p>
-                    <p className="text-xs font-mono font-bold">{new Date().toLocaleDateString()}</p>
-                  </div>
-                  <button 
-                    onClick={() => setActiveFolderId(null)}
-                    className="p-3 bg-white border border-archive-border hover:bg-black/5 transition-all flex items-center gap-2 text-[10px] font-mono uppercase font-bold tracking-widest ml-4"
-                  >
-                    <X size={16} /> Close_Archive
-                  </button>
-                </motion.div>
+                  <X size={16} /> Close_Archive
+                </motion.button>
 
-                {/* The Unfolding Folder Spread */}
+                {/* The Dossier Folder - Portrait Spread */}
                 <motion.div 
                   layoutId={activeFolderId}
-                  initial={{ rotate: -90, scale: 0.8, opacity: 0 }}
+                  className="relative w-[95%] md:w-[760px] h-[85vh] md:h-[90vh] bg-[#B08D57] border-[2px] border-[#8D6E63] shadow-[0_60px_120px_rgba(0,0,0,0.6)] flex flex-col md:flex-row rounded-sm z-50 origin-center"
+                  initial={{ rotate: -90, scale: 0.3, opacity: 0 }}
                   animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                  exit={{ rotate: -90, scale: 0.3, opacity: 0 }}
                   transition={{ 
-                    layout: { type: "spring", damping: 20, stiffness: 100 },
-                    default: { duration: 0.5 }
+                    rotate: { type: "spring", damping: 30, stiffness: 120 },
+                    scale: { type: "spring", damping: 25, stiffness: 100 },
+                    layout: { duration: 0.5, ease: "circOut" }
                   }}
-                  className="relative w-full h-full bg-[#E5DCC6] border border-archive-border shadow-[0_40px_100px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col md:flex-row rounded-sm origin-center"
                 >
-                  {/* Spine Fold Visual */}
-                  <div className="absolute left-[34%] top-0 bottom-0 w-[2px] bg-black/10 z-30 hidden md:block" />
-                  <div className="absolute left-[34%] top-0 bottom-0 w-8 bg-gradient-to-r from-black/10 to-transparent z-20 pointer-events-none hidden md:block" />
-
-                  {/* LEFT PANEL: Inside Cover / Attachments Area */}
-                  <div className="w-full md:w-[35%] h-full bg-[#C9B99E]/50 relative z-10 p-10 hidden md:block overflow-hidden">
-                    <div className="flex items-center gap-3 mb-12 opacity-50">
-                      <div className="w-10 h-[1px] bg-archive-border" />
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Attachments & Memos</span>
-                    </div>
-
-                    <div className="relative h-full flex flex-col pointer-events-none">
-                       {/* Draggable Note & Elements Context */}
-                       <div className="absolute inset-0 pointer-events-auto">
+                  {/* LEFT WING: Open Cover */}
+                  <motion.div 
+                    initial={{ rotateY: 0 }}
+                    animate={{ rotateY: -15 }}
+                    transition={{ delay: 0.6, duration: 1.2, ease: "easeOut" }}
+                    className="w-full md:w-[32%] h-full bg-[#96754E] relative z-20 border-r-2 border-black/10 origin-left hidden md:block overflow-hidden shadow-[15px_0_40px_rgba(0,0,0,0.2)]"
+                  >
+                    <div className="p-10 h-full flex flex-col">
+                       <div className="mb-10">
+                          <h4 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] opacity-40 mb-4 whitespace-nowrap">Archives // 绝密 17-B</h4>
+                          <h2 className="text-3xl font-serif italic tracking-tighter text-white/90">Dossier_<span className="font-bold">PRO</span></h2>
+                       </div>
+                       
+                       <div className="relative flex-1">
                           <DraggableNote 
-                            id="memo-1"
-                            text="该候选人（郑好）展示了极强的业务逻辑梳理能力及代码稳定性。"
+                            id="memo-c2"
+                            text="核心观察：候选人在架构选型上表现出极强的平衡感。"
                             color="bg-[#FFF9C4]"
-                            initPos={{ x: 20, y: 50 }}
-                            rotate={-6}
+                            initPos={{ x: 10, y: 30 }}
+                            rotate={-5}
                           />
-                          <motion.div 
-                            drag
-                            dragMomentum={false}
-                            className="absolute w-40 aspect-square bg-gray-100 border border-archive-border shadow-md right-4 top-40 rotate-[12deg] p-2 cursor-move z-40"
-                          >
-                             <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200" alt="Profile" className="w-full h-full object-cover grayscale" />
-                             <div className="mt-2 text-[8px] font-mono text-center uppercase tracking-tighter opacity-40 underline decoration-dotted">Subject_Photograph_Ref</div>
-                          </motion.div>
+                       </div>
 
-                          <motion.div
-                            drag
-                            dragMomentum={false}
-                            className="absolute w-48 p-6 bg-[#FFE0B2] border border-archive-border/30 shadow-sm -rotate-3 bottom-20 left-10 cursor-move z-40"
-                          >
-                            <div className="text-[8px] font-mono opacity-40 uppercase border-b border-black/5 mb-3">Office_Receipt_#882</div>
-                            <p className="text-[11px] italic leading-tight">
-                              "协助赴日参加宣讲，展示了优秀的跨技术栈沟通与英语应答能力。"
-                            </p>
-                            <div className="mt-4 flex justify-end">
-                              <div className="w-8 h-8 rounded-full border-2 border-red-400/20 flex items-center justify-center text-[8px] text-red-500/30 font-bold -rotate-12">VERIFIED</div>
-                            </div>
-                          </motion.div>
+                       <div className="mt-auto opacity-30">
+                          <p className="text-[8px] font-mono uppercase tracking-[0.4em]">Index: ZH_2026</p>
                        </div>
                     </div>
-                  </div>
+                  </motion.div>
 
-                  {/* RIGHT PANEL: The Main Text/Document Panel */}
-                  <div className="flex-1 h-full bg-white relative flex flex-col shadow-inner">
-                    {/* Paper Hole Punch Effect */}
-                    <div className="absolute left-6 top-0 bottom-0 flex flex-col justify-around py-12 pointer-events-none opacity-20 hidden md:flex">
-                      {[...Array(8)].map((_, i) => (
-                        <div key={i} className="w-3 h-3 rounded-full border border-archive-border bg-gray-100" />
-                      ))}
-                    </div>
+                  {/* RIGHT PANEL: The Main Document Page */}
+                  <div className="flex-1 h-full bg-[#FDFDFD] relative flex flex-col z-10 shadow-inner">
+                    {/* Spine Decoration */}
+                    <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/5 to-transparent z-30" />
 
-                    {/* Document Internal Header */}
-                    <div className="px-12 md:px-20 pt-16 pb-12 flex justify-between items-start border-b border-archive-border/5">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4 text-xs font-mono font-bold uppercase tracking-widest text-archive-border/50">
-                           <span>File_PG_{FOLDERS.findIndex(f => f.id === activeFolderId) + 1}</span>
-                           <span className="w-8 h-[1px] bg-archive-border/30" />
-                           <span className="italic">Records_System_2026</span>
-                        </div>
-                        <h3 className="text-4xl md:text-6xl font-serif italic tracking-tighter capitalize underline decoration-archive-border/5 decoration-4 underline-offset-8">
-                          {FOLDERS.find(f => f.id === activeFolderId)?.label.split('_')[1]}
-                        </h3>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="w-16 h-16 border-2 border-archive-border/10 flex items-center justify-center text-[10px] font-mono opacity-20 rotate-12">SEAL</div>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 p-12 md:p-20 overflow-y-auto custom-scrollbar scroll-smooth">
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={activeFolderId}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4 }}
-                        >
-                          {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
-                          {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
-                          {activeFolderId === 'PROJECTS' && <ProjectsView />}
-                          {activeFolderId === 'HOBBIES' && <HobbiesView />}
-                        </motion.div>
-                      </AnimatePresence>
-                    </div>
-
-                    {/* Footer for the content page */}
-                    <div className="bg-[#fcfcfc] border-t border-archive-border/5 px-12 md:px-20 py-8 flex justify-between items-center text-[10px] font-mono opacity-40 uppercase tracking-widest font-bold">
-                       <span className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-archive-border" />
-                          Authenticated_Data_Stream
-                       </span>
-                       <div className="flex gap-8">
-                          <span className="cursor-pointer hover:text-black hover:opacity-100 transition-all">Download_Archive</span>
-                          <span className="tabular-nums opacity-60">REF_ID: 2026_PRO_ZH</span>
-                       </div>
-                    </div>
-                  </div>
-
-                  {/* Tabs on the far right edge of the open folder */}
-                  <div className="absolute right-0 top-0 bottom-0 w-12 flex flex-col justify-center gap-4 bg-black/5 p-2 pointer-events-none hidden md:flex">
-                     {FOLDERS.map((f) => (
-                        <div 
-                           key={f.id} 
-                           className={`h-24 w-6 rounded-r-md border border-l-0 border-archive-border/20 transition-all ${activeFolderId === f.id ? f.color + ' opacity-100 scale-110 shadow-lg' : 'bg-gray-100 opacity-30 scale-100'}`}
-                        >
-                           <div className="rotate-90 origin-center whitespace-nowrap text-[8px] font-mono font-bold uppercase mt-8 -ml-3 tracking-widest">
-                              {f.label}
+                    {/* Header */}
+                    <div className="px-10 md:px-16 pt-16 pb-8 border-b border-black/5">
+                        <div className="space-y-4">
+                           <div className="flex items-center gap-4">
+                              <span className="text-[10px] font-mono font-bold tracking-[0.3em] uppercase opacity-40 italic">Document_Page</span>
+                              <div className="w-8 h-[1px] bg-archive-border/20" />
                            </div>
+                           <h3 className="text-5xl md:text-6xl font-serif italic tracking-tighter text-archive-border capitalize">
+                              {FOLDERS.find(f => f.id === activeFolderId)?.label.split('_')[1] || FOLDERS.find(f => f.id === activeFolderId)?.label}
+                           </h3>
                         </div>
-                     ))}
+                    </div>
+
+                    {/* Content Scroll Area */}
+                    <div className="flex-1 p-10 md:p-16 overflow-y-auto custom-scrollbar-minimal scroll-smooth">
+                       <AnimatePresence mode="wait">
+                          <motion.div
+                            key={activeFolderId}
+                            initial={{ 
+                               opacity: 0, 
+                               rotateY: 15, 
+                               x: 20 
+                            }}
+                            animate={{ 
+                               opacity: 1, 
+                               rotateY: 0, 
+                               x: 0 
+                            }}
+                            exit={{ 
+                               opacity: 0, 
+                               rotateY: -15, 
+                               x: -20 
+                            }}
+                            transition={{ duration: 0.5, ease: "circOut" }}
+                            className="origin-left"
+                          >
+                            {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
+                            {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
+                            {activeFolderId === 'PROJECTS' && <ProjectsView />}
+                            {activeFolderId === 'HOBBIES' && <HobbiesView />}
+                          </motion.div>
+                       </AnimatePresence>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="h-14 border-t border-black/5 bg-[#FAFAFA] flex items-center justify-between px-10 md:px-16 text-[9px] font-mono opacity-40 font-bold tracking-[0.2em]">
+                       <span>AUTHENTIC_ZH</span>
+                       <span>P.0{FOLDERS.findIndex(f => f.id === activeFolderId) + 1}</span>
+                    </div>
+                  </div>
+
+                  {/* Metal Clamp */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-10 bg-gradient-to-b from-[#B0BEC5] to-[#78909C] border-x border-[#546E7A] rounded-b-md z-[60] flex items-center justify-center shadow-lg">
+                     <div className="w-16 h-2 bg-black/20 rounded-full" />
                   </div>
                 </motion.div>
               </div>
@@ -316,19 +279,20 @@ function DraggableNote({ text, color, initPos, rotate = 0 }: { id: string; text:
          dragMomentum={false}
          initial={initPos ? { x: initPos.x, y: initPos.y, opacity: 0, rotate } : { opacity: 0, rotate }}
          animate={{ opacity: 1 }}
-         className={`pointer-events-auto absolute p-6 md:p-8 w-48 md:w-56 aspect-[5/4] ${color} border border-archive-border/10 shadow-[4px_4px_10px_rgba(0,0,0,0.05)] cursor-grab active:cursor-grabbing z-40 transition-shadow hover:shadow-xl group`}
+         whileDrag={{ scale: 1.05, zIndex: 100 }}
+         className={`pointer-events-auto absolute p-4 md:p-6 w-40 md:w-48 aspect-square ${color} border border-archive-border/10 shadow-[4px_4px_10px_rgba(0,0,0,0.1)] cursor-grab active:cursor-grabbing z-40 transition-shadow hover:shadow-xl group`}
       >
-         <div className="w-full h-full flex flex-col animate-in fade-in duration-1000">
-            <div className="flex gap-1.5 mb-4 items-center">
-               <div className="w-1.5 h-1.5 rounded-full bg-archive-border/40" />
-               <div className="w-8 h-[1px] bg-archive-border/10" />
+         <div className="w-full h-full flex flex-col">
+            <div className="flex gap-1.5 mb-3 items-center">
+               <div className="w-1.5 h-1.5 rounded-full bg-archive-border/30" />
+               <div className="w-4 h-[1px] bg-archive-border/5" />
             </div>
-            <p className="text-xs md:text-sm font-medium leading-relaxed font-serif italic text-archive-border/90">
-               "{text}"
+            <p className="text-[10px] md:text-xs font-semibold leading-relaxed font-sans text-archive-border/90">
+               {text}
             </p>
-            <div className="mt-auto pt-4 border-t border-black/5 flex justify-between items-center">
-               <span className="text-[8px] font-mono opacity-40 uppercase tracking-widest">Memo_ZH</span>
-               <div className="w-2 h-2 rounded-full border border-archive-border/20 group-hover:bg-archive-border/40 transition-colors" />
+            <div className="mt-auto pt-2 border-t border-black/5 flex justify-between items-center">
+               <span className="text-[7px] font-mono opacity-30 uppercase tracking-widest">Note_Ref</span>
+               <div className="w-1.5 h-1.5 rounded-full border border-archive-border/10" />
             </div>
          </div>
       </motion.div>
