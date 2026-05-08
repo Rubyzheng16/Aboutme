@@ -1,45 +1,63 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Github, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Download, 
-  X, 
-  ExternalLink,
-  ChevronRight,
+﻿import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import {
+  ArrowLeft,
+  Award,
+  BarChart3,
   Briefcase,
-  Layers,
-  Heart,
+  Camera,
+  ChevronRight,
+  Code2,
+  ExternalLink,
   FileText,
+  Github,
+  GraduationCap,
+  Heart,
+  Layers,
+  Mail,
+  MapPin,
   Megaphone,
   Music,
   Palette,
-  Camera,
-  Star
+  Phone,
+  Sparkles,
+  Star,
+  UserRound,
+  X
 } from 'lucide-react';
-import { resumeData, hobbyData } from './data';
+import { hobbyData, resumeData } from './data';
+import type { Project } from './data';
 
 type FolderId = 'PROFILE_EDU' | 'EXPERIENCE' | 'PROJECTS' | 'HOBBIES';
 
-const FOLDERS: { id: FolderId; label: string; color: string; hoverColor: string; tabOffset: string; icon: any }[] = [
-  { id: 'PROFILE_EDU', label: '01_概览', color: 'bg-[#E3D9C6]', hoverColor: 'group-hover:bg-[#D4C4A8]', tabOffset: 'ml-2 md:ml-4', icon: FileText },
-  { id: 'EXPERIENCE', label: '02_经历', color: 'bg-[#D6E0D4]', hoverColor: 'group-hover:bg-[#BACCB7]', tabOffset: 'ml-20 md:ml-32', icon: Briefcase },
-  { id: 'PROJECTS', label: '03_作品', color: 'bg-[#D4DEE5]', hoverColor: 'group-hover:bg-[#B8C8D4]', tabOffset: 'ml-[144px] md:ml-64', icon: Layers },
-  { id: 'HOBBIES', label: '04_爱好', color: 'bg-[#E5D4DE]', hoverColor: 'group-hover:bg-[#D4B8C8]', tabOffset: 'ml-[220px] md:ml-96', icon: Heart },
+const FOLDERS: { id: FolderId; label: string; color: string; tabOffset: string; icon: any }[] = [
+  { id: 'PROFILE_EDU', label: '01_概述', color: 'bg-[#E3D9C6]', tabOffset: 'ml-2 md:ml-4', icon: FileText },
+  { id: 'EXPERIENCE', label: '02_经历', color: 'bg-[#D6E0D4]', tabOffset: 'ml-20 md:ml-32', icon: Briefcase },
+  { id: 'PROJECTS', label: '03_作品', color: 'bg-[#D4DEE5]', tabOffset: 'ml-[144px] md:ml-64', icon: Layers },
+  { id: 'HOBBIES', label: '04_爱好', color: 'bg-[#E5D4DE]', tabOffset: 'ml-[220px] md:ml-96', icon: Heart },
 ];
 
 const HobbyIcons: Record<string, any> = { Megaphone, Music, Palette, Camera };
+
+const FOLDER_BACKDROPS: Record<FolderId, string> = {
+  PROFILE_EDU: '#302c22',
+  EXPERIENCE: '#233025',
+  PROJECTS: '#202b32',
+  HOBBIES: '#32252d',
+};
 
 export default function App() {
   const [activeFolderId, setActiveFolderId] = useState<FolderId | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [detailPhase, setDetailPhase] = useState<'extract' | 'flip' | 'fixed'>('extract');
+  const [previewPhoto, setPreviewPhoto] = useState<{ src: string; title: string } | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeFolderId) return;
     setDetailPhase('extract');
+    setPreviewPhoto(null);
+    setSelectedProjectId(null);
     const flipTimer = window.setTimeout(() => setDetailPhase('flip'), 260);
     const fixedTimer = window.setTimeout(() => setDetailPhase('fixed'), 860);
 
@@ -51,27 +69,19 @@ export default function App() {
 
   const getFolderTop = (index: number) => {
     const baseGap = window.innerWidth < 768 ? 45 : 65;
-    const hoverGap = window.innerWidth < 768 ? 160 : 320; // How much it expands
-    
+    const hoverGap = window.innerWidth < 768 ? 160 : 320;
     let top = (FOLDERS.length - 1 - index) * baseGap;
-    
-    // Shift down if a folder ABOVE this one is hovered
-    if (hoveredIdx !== null && index < hoveredIdx) {
-      top += hoverGap;
-    }
-    
+    if (hoveredIdx !== null && index < hoveredIdx) top += hoverGap;
     return top;
   };
 
   return (
     <div className="min-h-screen bg-archive-bg flex flex-col items-center justify-center p-4 md:p-8 font-sans selection:bg-orange-200 overflow-hidden wireframe-grid relative">
-      {/* Background Depth Shadow Overlay */}
       <div className="absolute inset-0 bg-radial-[circle_at_center,_transparent_0%,_rgba(0,0,0,0.03)_100%] pointer-events-none" />
-      
-      {/* Header */}
+
       <AnimatePresence>
         {!activeFolderId && (
-          <motion.header 
+          <motion.header
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
@@ -79,10 +89,10 @@ export default function App() {
           >
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="w-12 h-[1px] bg-archive-border/30" />
-              <span className="text-xs font-mono uppercase tracking-[0.2em] text-archive-border/60 text-[10px] md:text-xs">Professional Personal Archive</span>
+              <span className="text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] text-archive-border/60">Professional Personal Archive</span>
               <span className="w-12 h-[1px] bg-archive-border/30" />
             </div>
-            <h1 className="text-4xl md:text-7xl font-semibold tracking-tighter mb-4 uppercase">
+            <h1 className="text-4xl md:text-7xl font-semibold tracking-tight mb-4 uppercase">
               郑好个人简历
             </h1>
             <p className="text-[10px] md:text-sm font-mono text-archive-border/60 uppercase tracking-widest leading-relaxed">
@@ -93,59 +103,41 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Main Stack Container */}
       <div className="relative w-full max-w-5xl h-[450px] md:h-[650px] flex items-center justify-center">
         <AnimatePresence mode="popLayout">
           {!activeFolderId ? (
-            <motion.div 
-              key="stack"
-              className="relative w-full h-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div key="stack" className="relative w-full h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
               {FOLDERS.map((folder, index) => (
-                <motion.div 
+                <motion.div
                   key={folder.id}
                   layoutId={folder.id}
                   onClick={() => setActiveFolderId(folder.id)}
                   onHoverStart={() => setHoveredIdx(index)}
                   onHoverEnd={() => setHoveredIdx(null)}
-                  className="absolute w-[92%] md:w-[680px] cursor-pointer group left-1/2 -ml-[46%] md:-ml-[340px] folder-3d-depth"
-                  animate={{
-                    top: getFolderTop(index),
-                    zIndex: FOLDERS.length - index,
-                  }}
-                  transition={{ 
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30
-                  }}
+                  className={`absolute w-[92%] md:w-[680px] cursor-pointer group left-1/2 -ml-[46%] md:-ml-[340px] folder-3d-depth ${index === 0 ? '' : 'folder-slant-shadow'}`}
+                  animate={{ top: getFolderTop(index), zIndex: FOLDERS.length - index }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Folder Tab */}
                   <div className={`w-32 md:w-56 h-10 ${folder.color} border-t-2 border-l-2 border-r-2 border-black/10 folder-tab ${folder.tabOffset} text-[9px] md:text-sm flex items-center px-4 md:px-8 font-mono text-black/60 font-black uppercase transition-all duration-300 group-hover:brightness-105 paper-grain overflow-hidden`}>
                     <span className="relative z-10">{folder.label}</span>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
                   </div>
 
-                  {/* Folder Body */}
-                  <div className={`w-full h-64 md:h-[420px] ${folder.color} border-2 border-black/10 shadow-[20px_20px_60px_rgba(0,0,0,0.15)] p-8 md:p-14 flex flex-col justify-between transition-all duration-500 paper-grain relative overflow-hidden rounded-r-sm rounded-bl-sm`}>
-                    {/* Metal eyelet decoration */}
+                  <div className={`w-full h-64 md:h-[420px] ${folder.color} border-2 border-black/10 p-8 md:p-14 flex flex-col justify-between transition-all duration-500 paper-grain relative overflow-hidden rounded-r-sm rounded-bl-sm`}>
                     <div className="absolute top-8 right-8 w-4 h-4 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 border border-black/20 shadow-inner flex items-center justify-center">
-                       <div className="w-1.5 h-1.5 rounded-full bg-black/40" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-black/40" />
                     </div>
 
                     <div className="flex items-start justify-between relative z-10">
                       <div className="space-y-4">
                         <div className="flex items-center gap-3 opacity-30">
-                           <div className="w-2 h-2 rounded-full bg-black" />
-                           <p className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]">Fragment_{index+1}</p>
+                          <div className="w-2 h-2 rounded-full bg-black" />
+                          <p className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]">Fragment_{index + 1}</p>
                         </div>
-                        <h3 className="text-3xl md:text-5xl font-black italic tracking-tighter text-black/70">{folder.label}</h3>
+                        <h3 className="text-3xl md:text-5xl font-black italic tracking-tight text-black/70">{folder.label}</h3>
                       </div>
-                      <div className="p-4 bg-black/5 rounded-2xl group-hover:bg-white/40 transition-colors">
+                      <div className="p-4 bg-black/5 rounded-lg group-hover:bg-white/40 transition-colors">
                         <folder.icon size={44} strokeWidth={1} className="text-black/30 group-hover:text-black/70 transition-all" />
                       </div>
                     </div>
@@ -153,130 +145,79 @@ export default function App() {
                     <div className="flex justify-between items-end pb-4 relative z-10 border-t border-black/5 pt-8">
                       <div className="space-y-1">
                         <span className="text-[8px] font-mono opacity-30 block tracking-[0.4em] uppercase font-black">Archive_Sequence</span>
-                        <div className="flex items-center gap-4">
-                           <span className="text-sm md:text-lg font-mono font-bold tracking-tighter uppercase text-black/40 italic">BUREAU_ZH//0{index+1}</span>
-                        </div>
+                        <span className="text-sm md:text-lg font-mono font-bold tracking-tight uppercase text-black/40 italic">BUREAU_ZH//0{index + 1}</span>
                       </div>
                       <div className="w-12 h-12 rounded-full border-2 border-black/5 flex items-center justify-center group-hover:bg-black transition-all">
                         <ChevronRight size={20} className="text-black/30 group-hover:text-white transition-all group-hover:translate-x-1" />
                       </div>
                     </div>
                   </div>
-
-                  {/* Visual Thickness beneath the body */}
-                  <div className="folder-thickness rounded-r-sm rounded-bl-sm" />
+                  {index !== 0 && <div className="folder-thickness rounded-r-sm rounded-bl-sm" />}
                 </motion.div>
               ))}
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-start justify-center bg-[#1a1a1a]/98 overflow-hidden pt-10 md:pt-20"
+              className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden pt-10 md:pt-20"
+              style={{ backgroundColor: FOLDER_BACKDROPS[activeFolderId] }}
             >
+              {activeFolderId === 'PROFILE_EDU' && <FloatingEmojiField />}
               <div className="relative w-full max-w-7xl flex flex-col items-center">
-                
-                {/* Close Button UI - Fixed position */}
-                <motion.button 
+                <motion.button
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
                   transition={{ delay: 0.4 }}
                   onClick={() => setActiveFolderId(null)}
                   className="fixed top-6 right-6 md:top-12 md:right-12 p-4 bg-white/5 rounded-full text-white hover:bg-white/20 transition-all z-[120] flex items-center justify-center backdrop-blur-md border border-white/10"
+                  aria-label="关闭"
                 >
                   <X size={28} strokeWidth={1} />
                 </motion.button>
 
-                {detailPhase !== 'extract' && <DossierPage activeFolderId={activeFolderId} />}
-                <PageFlipTransition detailPhase={detailPhase} activeFolderId={activeFolderId} />
-
-                {/* Disabled: previous fixed reader experiment kept out of the render path. */}
-                {false && (() => {
-                  const currentFolder = FOLDERS.find(f => f.id === activeFolderId);
-                  const currentFolderLabel = currentFolder?.label?.replace('_', ' ') ?? 'Document';
-                  return (
-                    <motion.div
-                      layoutId={activeFolderId}
-                      className="detail-shell px-3 md:px-8"
-                      initial={{ opacity: 0, y: 90, scale: 0.76 }}
-                      animate={{
-                        opacity: 1,
-                        y: detailPhase === 'extract' ? 42 : 0,
-                        scale: detailPhase === 'extract' ? 0.84 : detailPhase === 'flip' ? 0.92 : 1,
-                      }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <div key={detailPhase} className={`detail-fixed-board ${detailPhase === 'fixed' ? 'detail-fixed-board--fixed' : ''}`}>
-                        {detailPhase === 'fixed' ? (
-                          <>
-                            <div className="detail-left-empty" />
-                            <div className="detail-right-scroll custom-scrollbar-minimal">
-                              <div className="mb-10 md:mb-14">
-                                <p className="text-xs font-mono tracking-[0.34em] uppercase text-black/40 mb-3">File {currentFolderLabel}</p>
-                                <h2 className="text-4xl md:text-6xl font-serif italic tracking-tight mb-3">Unverified</h2>
-                                <p className="text-black/55 leading-relaxed">右页展示简历内容，左页保持空白。翻页结束后进入固定阅读模式，鼠标滚动可继续查看下方内容。</p>
-                              </div>
-
-                              <AnimatePresence mode="wait">
-                                <motion.div
-                                  key={activeFolderId}
-                                  initial={{ opacity: 0, y: 24 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0 }}
-                                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                                  className="resume-flow"
-                                >
-                                  {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
-                                  {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
-                                  {activeFolderId === 'PROJECTS' && <ProjectsView />}
-                                  {activeFolderId === 'HOBBIES' && <HobbiesView />}
-                                </motion.div>
-                              </AnimatePresence>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="pageflip-host">
-                            <div className="pageflip-page pageflip-page--blank" />
-                            <div className="pageflip-page pageflip-page--resume custom-scrollbar-minimal">
-                              <div className="mb-10 md:mb-14">
-                                <p className="text-xs font-mono tracking-[0.34em] uppercase text-black/40 mb-3">File {currentFolderLabel}</p>
-                                <h2 className="text-4xl md:text-6xl font-serif italic tracking-tight mb-3">Unverified</h2>
-                                <p className="text-black/55 leading-relaxed">翻页阶段：左页为空白纸张，右页为简历内容。</p>
-                              </div>
-                              <div className="resume-flow">
-                                {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
-                                {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
-                                {activeFolderId === 'PROJECTS' && <ProjectsView />}
-                                {activeFolderId === 'HOBBIES' && <HobbiesView />}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  );
-                })()}
+                {activeFolderId === 'PROJECTS' ? (
+                  <FullCorkboardProjectsPage
+                    selectedProjectId={selectedProjectId}
+                    onProjectSelect={setSelectedProjectId}
+                    onProjectClose={() => setSelectedProjectId(null)}
+                    onPreviewPhoto={setPreviewPhoto}
+                  />
+                ) : (
+                  <>
+                    {detailPhase !== 'extract' && (
+                      <DossierPage
+                        activeFolderId={activeFolderId}
+                        showLeftPage={detailPhase === 'fixed'}
+                        onPreviewPhoto={setPreviewPhoto}
+                        selectedProjectId={selectedProjectId}
+                        onProjectSelect={setSelectedProjectId}
+                        onProjectClose={() => setSelectedProjectId(null)}
+                      />
+                    )}
+                    <PageFlipTransition detailPhase={detailPhase} activeFolderId={activeFolderId} />
+                  </>
+                )}
+                <PhotoPreview preview={previewPhoto} onClose={() => setPreviewPhoto(null)} />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Persistence Footer */}
       <AnimatePresence>
         {!activeFolderId && (
-          <motion.footer 
+          <motion.footer
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
             className="mt-16 flex flex-col items-center gap-6"
           >
-            <a 
-              href="https://github.com/ln-dev7/square-ui" 
-              target="_blank" 
+            <a
+              href="https://github.com/ln-dev7/square-ui"
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 group px-4 py-2 border border-archive-border/10 hover:border-archive-border/40 transition-all rounded-full bg-white/40"
             >
@@ -284,7 +225,7 @@ export default function App() {
               <span className="text-xs font-mono opacity-50 group-hover:opacity-100 transition-opacity">/ln-dev7/square-ui</span>
             </a>
             <p className="text-[10px] font-mono opacity-30 uppercase tracking-[0.4em]">
-              ZHENG HAO Archive System · 版权所有 © 2026
+              ZHENG HAO Archive System 路 2026
             </p>
           </motion.footer>
         )}
@@ -293,41 +234,36 @@ export default function App() {
   );
 }
 
-function DraggableNote({ text, color, initPos, rotate = 0 }: { id: string; text: string; color: string; initPos?: { x: number; y: number }, rotate?: number }) {
-   return (
-      <motion.div
-         drag
-         dragMomentum={false}
-         initial={initPos ? { x: initPos.x, y: initPos.y, opacity: 0, rotate } : { opacity: 0, rotate }}
-         animate={{ opacity: 1 }}
-         whileDrag={{ scale: 1.05, zIndex: 100 }}
-         className={`pointer-events-auto absolute p-4 md:p-6 w-40 md:w-48 aspect-square ${color} border border-archive-border/10 shadow-[4px_4px_10px_rgba(0,0,0,0.1)] cursor-grab active:cursor-grabbing z-40 transition-shadow hover:shadow-xl group`}
-      >
-         <div className="w-full h-full flex flex-col">
-            <div className="flex gap-1.5 mb-3 items-center">
-               <div className="w-1.5 h-1.5 rounded-full bg-archive-border/30" />
-               <div className="w-4 h-[1px] bg-archive-border/5" />
-            </div>
-            <p className="text-[10px] md:text-xs font-semibold leading-relaxed font-sans text-archive-border/90">
-               {text}
-            </p>
-            <div className="mt-auto pt-2 border-t border-black/5 flex justify-between items-center">
-               <span className="text-[7px] font-mono opacity-30 uppercase tracking-widest">Note_Ref</span>
-               <div className="w-1.5 h-1.5 rounded-full border border-archive-border/10" />
-            </div>
-         </div>
-      </motion.div>
-   );
-}
+function FloatingEmojiField() {
+  const emojis = ['*', '+', 'cake', 'note', 'star', 'heart', 'pin', 'tag', 'memo'];
+  const floaters = Array.from({ length: 24 }, (_, index) => ({
+    id: index,
+    side: index % 2 === 0 ? 'left' : 'right',
+    offset: 10 + ((index * 23) % 68),
+    delay: (index % 12) * -0.95,
+    duration: 7 + (index % 6) * 0.75,
+    size: 17 + (index % 5) * 4,
+    rotate: -24 + (index % 7) * 10,
+    symbol: emojis[index % emojis.length],
+  }));
 
-function DetailItem({ icon: Icon, label, value }: any) {
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-2 opacity-50">
-        <Icon size={12} />
-        <span className="text-[9px] font-mono uppercase tracking-widest">{label}</span>
-      </div>
-      <span className="text-xs font-semibold">{value}</span>
+    <div className="floating-emoji-field" aria-hidden="true">
+      {floaters.map((item) => (
+        <span
+          key={item.id}
+          className={`floating-emoji floating-emoji--${item.side}`}
+          style={{
+            ...(item.side === 'left' ? { left: `${item.offset}%` } : { right: `${item.offset}%` }),
+            fontSize: `${item.size}px`,
+            animationDelay: `${item.delay}s`,
+            animationDuration: `${item.duration}s`,
+            transform: `rotate(${item.rotate}deg)`,
+          }}
+        >
+          {item.symbol}
+        </span>
+      ))}
     </div>
   );
 }
@@ -352,44 +288,23 @@ function PageFlipTransition({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.01 }}
         >
-          <motion.div
-            className="book-open-stage"
-            initial={{ y: 40, scale: 0.995 }}
-            animate={{
-              y: 0,
-              scale: 1,
-            }}
-            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <motion.div
-              className="book-open-spread"
-            >
-              <motion.div
-                className="book-open-right-cover"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: isOpen ? 1 : 0 }}
-                transition={{ duration: 0.01 }}
-              >
-                <PageIntro activeFolderId={activeFolderId} className="book-open-right-intro" />
-              </motion.div>
+          <motion.div className="book-open-stage" initial={{ y: 40, scale: 0.995 }} animate={{ y: 0, scale: 1 }} transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}>
+            <motion.div className="book-open-spread">
+              {isOpen && <div className="book-open-spine-shadow" />}
               <motion.div
                 className={`book-open-turning-cover ${folder.color}`}
                 animate={{
-                  width: "50%",
-                  left: isOpen ? "calc(50% - 2px)" : "50%",
+                  width: 'calc(50% + 10px)',
+                  left: isOpen ? 'calc(50% - 10px)' : 'calc(50% - 2px)',
                   rotateY: isOpen ? -156 : 0,
                 }}
                 transition={{ duration: 0.58, ease: [0.18, 0.92, 0.2, 1] }}
               >
                 <div className={`book-open-cover-front ${folder.color}`}>
-                  <div className={`book-open-tab ${folder.color} folder-tab`}>
-                    {folder.label}
-                  </div>
+                  <div className={`book-open-tab ${folder.color} folder-tab`}>{folder.label}</div>
                 </div>
                 <div className={`book-open-cover-back ${folder.color}`}>
-                  <div className={`book-open-tab ${folder.color} folder-tab`}>
-                    {folder.label}
-                  </div>
+                  <div className={`book-open-tab ${folder.color} folder-tab`}>{folder.label}</div>
                 </div>
               </motion.div>
             </motion.div>
@@ -400,110 +315,85 @@ function PageFlipTransition({
   );
 }
 
-function PageIntro({ activeFolderId, className = "" }: { activeFolderId: FolderId; className?: string }) {
+function DossierPage({
+  activeFolderId,
+  showLeftPage = true,
+  onPreviewPhoto,
+  selectedProjectId,
+  onProjectSelect,
+  onProjectClose,
+}: {
+  activeFolderId: FolderId;
+  showLeftPage?: boolean;
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+  selectedProjectId: string | null;
+  onProjectSelect: (projectId: string) => void;
+  onProjectClose: () => void;
+}) {
   const currentFolder = FOLDERS.find(f => f.id === activeFolderId);
-  const title = currentFolder?.label.split('_')[1] || currentFolder?.label;
-
-  return (
-    <div className={className}>
-      <div className="flex items-center gap-6 mb-12 opacity-20">
-        <div className="w-16 h-[2px] bg-black" />
-        <span className="text-xs font-mono tracking-[0.5em]">CERTIFIED_DOC</span>
-      </div>
-      <h3 className="text-7xl md:text-[120px] font-serif italic tracking-tighter text-black/95 mb-16 capitalize leading-[0.8]">
-        {title}
-      </h3>
-      <p className="text-2xl md:text-3xl text-black/40 leading-relaxed font-serif max-w-2xl">
-        Part of the unindexed materials recovered from the {title} bureau. Authenticated via standard protocols.
-      </p>
-    </div>
-  );
-}
-
-function DossierPage({ activeFolderId }: { activeFolderId: FolderId }) {
-  const currentFolder = FOLDERS.find(f => f.id === activeFolderId);
-
   return (
     <motion.div
       layoutId={activeFolderId}
-      className={`relative w-full md:w-[100%] h-[calc(100vh-2.5rem)] md:h-[calc(100vh-5rem)] ${currentFolder?.color || 'bg-[#B08D57]'} flex flex-col md:flex-row z-50 origin-center paper-grain overflow-visible`}
+      className={`relative w-full md:w-[100%] h-[calc(100vh-2.5rem)] md:h-[calc(100vh-5rem)] ${showLeftPage ? currentFolder?.color || 'bg-[#B08D57]' : 'bg-transparent'} flex flex-col md:flex-row z-50 origin-center paper-grain overflow-visible`}
       initial={{ opacity: 1, scale: 1 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.12 }}
-      style={{ perspective: "2500px" }}
+      style={{ perspective: '2500px' }}
     >
-      {/* LEFT PANEL: Flip Animation Blank Page */}
       <motion.div
-        initial={{ rotateY: 0, originX: "100%" }}
+        initial={{ rotateY: 0, originX: '100%' }}
         animate={{ rotateY: 0 }}
-        transition={{
-          duration: 1.2,
-          ease: [0.22, 1, 0.36, 1],
-          delay: 0.1
-        }}
-        className="w-full md:w-1/2 h-[45vh] md:h-full shrink-0 sticky top-0 z-20 overflow-visible border-b md:border-b-0 md:border-r border-black/10 shadow-[20px_0_50px_rgba(0,0,0,0.2)] transform-gpu"
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        className={`w-full md:w-1/2 h-[45vh] md:h-full shrink-0 sticky top-0 z-20 overflow-visible border-b md:border-b-0 md:border-r border-black/10 shadow-[20px_0_50px_rgba(0,0,0,0.2)] transform-gpu ${showLeftPage ? 'opacity-100' : 'opacity-0'}`}
       >
         <div className={`${currentFolder?.color || 'bg-[#B08D57]'} folder-tab final-folder-tab`}>
           {currentFolder?.label}
         </div>
         <div className="absolute inset-0 bg-black/5 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black/20 to-transparent z-30" />
-        <div className="absolute right-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
-          {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
-        </div>
-        <motion.div
-          initial={{ opacity: 0.4 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 1.2, delay: 0.1 }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
-        />
+        {showLeftPage && activeFolderId === 'PROFILE_EDU' && <LeftProfileBoard />}
+        {showLeftPage && activeFolderId === 'EXPERIENCE' && <ExperiencePhotoBoard onPreviewPhoto={onPreviewPhoto} />}
       </motion.div>
 
-      {/* RIGHT CONTENT: Infinite Roll Portal */}
-      <div className="w-full md:w-1/2 h-full overflow-y-auto custom-scrollbar-minimal bg-white relative flex flex-col z-10 document-infinite-roll border-l border-black/5 shadow-[-10px_0_30px_rgba(0,0,0,0.05)]">
-        <div className="absolute left-10 top-0 bottom-0 flex flex-col items-center justify-around py-20 pointer-events-none opacity-5">
-          {Array.from({ length: 20 }).map((_, i) => <div key={i} className="w-5 h-5 rounded-full bg-black shadow-inner mb-40" />)}
-        </div>
-
-        <div className="p-12 md:p-32 space-y-48">
+      <div className="w-full md:w-[calc(50%+0.5rem)] md:-ml-2 h-full overflow-y-auto custom-scrollbar-minimal bg-white relative flex flex-col z-10 document-infinite-roll border-l border-black/5 shadow-[-8px_0_22px_rgba(0,0,0,0.045)]">
+        <div className="p-8 md:p-20 lg:p-24 space-y-16">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-6 mb-12 opacity-20">
-              <div className="w-16 h-[2px] bg-black" />
-              <span className="text-xs font-mono tracking-[0.5em]">CERTIFIED_DOC</span>
+            <div className="flex items-center gap-5 mb-8 opacity-25">
+              <div className="w-14 h-[2px] bg-black" />
+              <span className="text-xs font-mono tracking-[0.42em]">CERTIFIED_DOC</span>
             </div>
-            <h3 className="text-7xl md:text-[120px] font-serif italic tracking-tighter text-black/95 mb-16 capitalize leading-[0.8]">
+            <h3 className="text-5xl md:text-7xl font-serif italic tracking-tight text-black/95 mb-8 leading-[0.9]">
               {currentFolder?.label.split('_')[1] || currentFolder?.label}
             </h3>
-            <p className="text-2xl md:text-3xl text-black/40 leading-relaxed font-serif max-w-2xl">
-              Part of the unindexed materials recovered from the {currentFolder?.label.split('_')[1]} bureau. Authenticated via standard protocols.
-            </p>
           </div>
 
           <div className="w-full h-px bg-black/5" />
 
-          <div className="min-h-screen">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeFolderId}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
-                {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
-                {activeFolderId === 'PROJECTS' && <ProjectsView />}
-                {activeFolderId === 'HOBBIES' && <HobbiesView />}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeFolderId}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {activeFolderId === 'PROFILE_EDU' && <CombinedView />}
+              {activeFolderId === 'EXPERIENCE' && <ExperienceView />}
+              {activeFolderId === 'PROJECTS' && (
+                <CorkboardProjectsView
+                  selectedProjectId={selectedProjectId}
+                  onProjectSelect={onProjectSelect}
+                  onProjectClose={onProjectClose}
+                  onPreviewPhoto={onPreviewPhoto}
+                />
+              )}
+              {activeFolderId === 'HOBBIES' && <HobbiesView />}
+            </motion.div>
+          </AnimatePresence>
 
-          <div className="pt-32 border-t-4 border-double border-black/10 flex justify-between items-baseline opacity-30 font-mono text-[9px] font-black uppercase tracking-[0.5em]">
-            <div className="flex gap-12">
-              <span>Verified_Record</span>
-              <span>Bureau_ZH</span>
-            </div>
+          <div className="pt-20 border-t-4 border-double border-black/10 flex justify-between items-baseline opacity-30 font-mono text-[9px] font-black uppercase tracking-[0.5em]">
+            <span>Verified_Record</span>
             <span>End_Of_Document</span>
           </div>
         </div>
@@ -512,66 +402,341 @@ function DossierPage({ activeFolderId }: { activeFolderId: FolderId }) {
   );
 }
 
-
 function CombinedView() {
+  const basicInfo = [
+    { icon: UserRound, label: '姓名', value: resumeData.name },
+    { icon: Phone, label: '电话', value: resumeData.phone },
+    { icon: Mail, label: '邮箱', value: resumeData.email },
+    { icon: MapPin, label: '现居地', value: resumeData.location },
+    { icon: Star, label: '鍑虹敓骞存湀', value: resumeData.birth },
+    { icon: Sparkles, label: '实习状态', value: resumeData.internship },
+  ];
+
   return (
-    <div className="space-y-16">
-      <section>
-        <SectionHeader title="档案主角 | 优势陈述" />
-        <div className="grid gap-8">
-          {resumeData.advantages.map((adv, i) => (
-            <div key={i} className="flex gap-8 items-start group">
-              <span className="text-3xl font-mono text-archive-border/10 font-black group-hover:text-archive-border/30 transition-colors">0{i+1}</span>
-              <p className="text-base md:text-lg leading-relaxed text-archive-border/80 border-b border-archive-border/5 pb-6 flex-1">
-                {adv}
-              </p>
+    <div className="space-y-10 md:space-y-12">
+      <section className="overview-section">
+        <SectionHeader title="基本信息" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {basicInfo.map(({ icon, label, value }) => (
+            <div key={label}>
+              <InfoCell icon={icon} label={label} value={value} />
             </div>
           ))}
         </div>
       </section>
 
-      <section>
-        <SectionHeader title="教育背景 | 学术档案" />
-        <div className="space-y-8">
-          {resumeData.education.map((edu, i) => (
-            <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-8 border border-archive-border/10 bg-gray-50/50 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1 h-full bg-archive-border/20 group-hover:bg-archive-border transition-colors" />
-              <div>
-                <h4 className="text-2xl font-bold mb-2">{edu.school}</h4>
-                <p className="text-base text-archive-border/60">{edu.major} · {edu.degree}</p>
+      <section className="overview-section">
+        <SectionHeader title="教育经历" />
+        {resumeData.education.map((edu) => (
+          <div key={edu.school} className="grid gap-4 md:grid-cols-[1fr_auto] items-end border border-archive-border/10 bg-[#f8f5ea]/80 p-5 md:p-6">
+            <div>
+              <div className="flex items-center gap-3 text-archive-border/50 mb-3">
+                <GraduationCap size={18} />
+                <span className="text-[10px] font-mono uppercase tracking-[0.3em]">Education</span>
               </div>
-              <div className="mt-4 md:mt-0 text-xs font-mono bg-archive-border text-white px-4 py-2 uppercase tracking-widest">
-                {edu.period}
-              </div>
+              <h4 className="text-2xl md:text-3xl font-black tracking-tight">{edu.school}</h4>
+              <p className="mt-2 text-sm md:text-base text-archive-border/65">{edu.major} 路 {edu.degree}</p>
             </div>
-          ))}
-        </div>
+            <div className="text-xs font-mono bg-archive-border text-white px-4 py-2 tracking-widest w-fit">
+              {edu.period}
+            </div>
+          </div>
+        ))}
       </section>
+
+      <section className="space-y-6">
+          <section className="overview-section">
+            <SectionHeader title="技能总结词条" />
+            <div className="grid gap-3 sm:grid-cols-2">
+              {resumeData.skillTags.map((tag, index) => (
+                <motion.div
+                  key={tag}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                  className="flex items-center gap-3 border border-archive-border/10 bg-white/80 px-4 py-3 shadow-sm"
+                >
+                  <Code2 size={16} className="text-archive-border/45 shrink-0" />
+                  <span className="text-sm font-semibold text-archive-border/80">{tag}</span>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <section className="overview-section">
+            <SectionHeader title="个人优势" />
+            <div className="space-y-3">
+              {resumeData.advantages.map((adv, i) => (
+                <div key={adv} className="grid grid-cols-[34px_1fr] gap-4 border-b border-archive-border/10 pb-3">
+                  <span className="text-lg font-mono text-archive-border/20 font-black">0{i + 1}</span>
+                  <p className="text-sm md:text-base leading-relaxed text-archive-border/75">{adv}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="overview-section">
+            <SectionHeader title="奖项荣誉" />
+            <div className="grid gap-3">
+              {resumeData.awards.map((award) => (
+                <div key={award} className="flex gap-3 items-start bg-[#f7fbff] border border-[#9bb5c8]/30 px-4 py-3">
+                  <Award size={18} className="text-[#4f748d] shrink-0 mt-0.5" />
+                  <span className="text-sm md:text-base font-semibold text-archive-border/80">{award}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+      </section>
+    </div>
+  );
+}
+
+function LeftProfileBoard() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <motion.div
+        className="absolute left-[7%] top-[10%] w-[86%] max-w-[500px] min-h-[560px]"
+        initial={{ opacity: 0, y: 110 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.16, duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {resumeData.photos.daily.map((photo, index) => (
+          <div key={photo}>
+            <PhotoSticky
+              src={photo}
+              label={index === 0 ? 'ID PHOTO' : `DAILY 0${index}`}
+              className={[
+                'left-[7%] top-[2%] w-36 md:w-40 rotate-[-5deg] z-30',
+                'left-[36%] top-[12%] w-44 md:w-52 rotate-[5deg] z-20',
+                'left-[12%] top-[43%] w-48 md:w-56 rotate-[-3deg] z-10',
+              ][index]}
+              delay={0.14 + index * 0.12}
+              imageClassName={index === 0 ? 'aspect-square object-cover object-center' : 'aspect-[4/5] object-cover object-center'}
+            />
+          </div>
+        ))}
+        <DraggableNote
+          text="前端开发 / 数据分析 / AI 产品复盘 / 内容运营"
+          color="bg-[#fff0a8]"
+          initPos={{ x: 238, y: 348 }}
+          rotate={-4}
+        />
+        <motion.div
+          className="absolute left-[48%] top-[55%] w-44 bg-[#dff0e4] border border-archive-border/10 p-4 shadow-[5px_8px_18px_rgba(0,0,0,0.12)] rotate-[5deg] z-40"
+          drag
+          dragMomentum={false}
+          initial={{ opacity: 0, y: 36, rotate: 5 }}
+          animate={{ opacity: 1, y: 0, rotate: 5 }}
+          transition={{ delay: 0.34, duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
+          whileDrag={{ scale: 1.04, zIndex: 100 }}
+        >
+          <div className="flex items-center gap-2 text-archive-border/35 mb-3">
+            <Sparkles size={14} />
+            <span className="text-[8px] font-mono tracking-[0.28em] uppercase">Hello</span>
+          </div>
+          <p className="text-xs font-semibold leading-relaxed text-archive-border/80">
+            可长期实习，能把页面实现、交互开发、数据观察和内容策略串起来。
+          </p>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
+function PhotoSticky({
+  src,
+  label,
+  className,
+  delay,
+  imageClassName,
+}: {
+  src: string;
+  label: string;
+  className: string;
+  delay: number;
+  imageClassName: string;
+}) {
+  return (
+    <motion.div
+      drag
+      dragMomentum={false}
+      initial={{ opacity: 0, y: 58 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
+      whileDrag={{ scale: 1.04, zIndex: 100 }}
+      className={`absolute bg-white p-3 shadow-[0_18px_40px_rgba(0,0,0,0.14)] border border-black/10 cursor-grab active:cursor-grabbing ${className}`}
+    >
+      <div className="overflow-hidden bg-[#e8eef4] border border-black/5">
+        <img src={src} alt={label} className={`w-full h-full ${imageClassName}`} />
+      </div>
+      <div className="pt-3 flex items-center justify-between">
+        <span className="text-[10px] font-mono tracking-[0.3em] text-archive-border/45">{label}</span>
+        <BarChart3 size={15} className="text-archive-border/35" />
+      </div>
+    </motion.div>
+  );
+}
+
+function DraggableNote({ text, color, initPos, rotate = 0 }: { text: string; color: string; initPos?: { x: number; y: number }, rotate?: number }) {
+  return (
+    <motion.div
+      drag
+      dragMomentum={false}
+      initial={initPos ? { x: initPos.x, y: initPos.y, opacity: 0, rotate } : { opacity: 0, rotate }}
+      animate={{ opacity: 1 }}
+      whileDrag={{ scale: 1.05, zIndex: 100 }}
+      className={`pointer-events-auto absolute p-4 md:p-5 w-44 aspect-square ${color} border border-archive-border/10 shadow-[4px_4px_10px_rgba(0,0,0,0.1)] cursor-grab active:cursor-grabbing z-40 transition-shadow hover:shadow-xl group`}
+    >
+      <div className="w-full h-full flex flex-col">
+        <div className="flex gap-1.5 mb-3 items-center">
+          <div className="w-1.5 h-1.5 rounded-full bg-archive-border/30" />
+          <div className="w-4 h-[1px] bg-archive-border/10" />
+        </div>
+        <p className="text-xs font-semibold leading-relaxed text-archive-border/90">{text}</p>
+        <div className="mt-auto pt-2 border-t border-black/5 flex justify-between items-center">
+          <span className="text-[7px] font-mono opacity-30 uppercase tracking-widest">Drag_Note</span>
+          <Sparkles size={12} className="opacity-35" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function ExperiencePhotoBoard({ onPreviewPhoto }: { onPreviewPhoto: (photo: { src: string; title: string }) => void }) {
+  const groups = [
+    {
+      title: 'Japan Product Talk',
+      subtitle: '鍟嗗姟浠ｈ〃 / 浜у搧璁茶В',
+      photos: [
+        '/assets/exp-japan-01.jpg',
+        '/assets/exp-japan-02.jpg',
+        '/assets/exp-japan-03.jpg',
+      ],
+    },
+    {
+      title: 'SIAT Internship',
+      subtitle: '中科院实习 / Unity 实验',
+      photos: [
+        '/assets/exp-siat-01.jpg',
+        '/assets/exp-siat-02.jpg',
+        '/assets/exp-siat-03.jpg',
+      ],
+    },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <motion.div
+        className="absolute left-[7%] top-[8%] w-[86%] max-w-[560px] space-y-5"
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.16, duration: 0.66, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {groups.map((group, groupIndex) => (
+          <motion.div
+            key={group.title}
+            initial={{ opacity: 0, y: 34 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.24 + groupIndex * 0.14, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="experience-photo-group"
+          >
+            <div className="experience-photo-caption">
+              <span>{group.title}</span>
+              <small>{group.subtitle}</small>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {group.photos.map((photo, index) => (
+                <motion.button
+                  key={photo}
+                  type="button"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => onPreviewPhoto({ src: photo, title: `${group.title} 0${index + 1}` })}
+                  className="experience-photo-tile"
+                >
+                  <img src={photo} alt={`${group.title} ${index + 1}`} />
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+function PhotoPreview({
+  preview,
+  onClose,
+}: {
+  preview: { src: string; title: string } | null;
+  onClose: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      {preview && (
+        <motion.div
+          className="photo-preview-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="photo-preview-frame"
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 14, scale: 0.97 }}
+            transition={{ duration: 0.22 }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="photo-preview-header">
+              <span>{preview.title}</span>
+              <button type="button" onClick={onClose} aria-label="关闭图片预览">
+                <X size={18} />
+              </button>
+            </div>
+            <img src={preview.src} alt={preview.title} />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function InfoCell({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+  return (
+    <div className="border border-archive-border/10 bg-white/70 px-4 py-3">
+      <div className="flex items-center gap-2 text-archive-border/45 mb-1">
+        <Icon size={13} />
+        <span className="text-[9px] font-mono uppercase tracking-[0.25em]">{label}</span>
+      </div>
+      <span className="text-sm md:text-base font-bold text-archive-border/85">{value}</span>
     </div>
   );
 }
 
 function ExperienceView() {
   return (
-    <div className="space-y-16">
-      {resumeData.experiences.map((exp, i) => (
-        <div key={i} className="space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-archive-border pb-4 gap-4">
+    <div className="space-y-9">
+      {resumeData.experiences.map((exp) => (
+        <div key={exp.company} className="border border-archive-border/10 bg-white/75 p-5 md:p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-archive-border/15 pb-4 gap-3">
             <div>
-              <p className="text-xs font-mono opacity-50 uppercase tracking-widest mb-2">Company / Organization</p>
-              <h4 className="text-3xl font-black italic uppercase tracking-tighter">{exp.company}</h4>
+              <p className="text-[10px] font-mono opacity-45 uppercase tracking-[0.28em] mb-2">Internship / Practice</p>
+              <h4 className="text-2xl md:text-3xl font-black italic uppercase tracking-tight">{exp.company}</h4>
+              <p className="mt-2 text-sm font-semibold text-archive-border/65">{exp.role}</p>
             </div>
             <div className="text-right">
               <p className="text-[10px] font-mono opacity-50 uppercase tracking-widest mb-1">Timeframe</p>
               <span className="text-sm font-bold bg-archive-bg px-3 py-1 border border-archive-border/10">{exp.period}</span>
             </div>
           </div>
-          <div className="grid md:grid-cols-[200px_1fr] gap-8">
-            <p className="text-sm font-mono text-archive-border uppercase tracking-widest">职位：{exp.role}</p>
-            <ul className="space-y-6">
-              {exp.highlights.map((h, j) => (
-                <li key={j} className="text-base leading-relaxed flex gap-6 group">
-                  <span className="text-archive-border/30 font-mono mt-1 group-hover:text-archive-border transition-colors">▸</span>
+          <div className="pt-5">
+            <ul className="space-y-3">
+              {exp.highlights.map((h) => (
+                <li key={h} className="text-sm md:text-[15px] leading-relaxed flex gap-3 group text-archive-border/78">
+                  <span className="text-archive-border/30 font-mono mt-1 group-hover:text-archive-border transition-colors">-</span>
                   {h}
                 </li>
               ))}
@@ -583,32 +748,396 @@ function ExperienceView() {
   );
 }
 
-function ProjectsView() {
+function ProjectsView({
+  selectedProjectId,
+  onProjectSelect,
+  onProjectClose,
+  onPreviewPhoto,
+}: {
+  selectedProjectId: string | null;
+  onProjectSelect: (projectId: string) => void;
+  onProjectClose: () => void;
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+}) {
+  const selectedProject = resumeData.projects.find((project) => project.id === selectedProjectId) ?? null;
   return (
-    <div className="grid gap-16 md:grid-cols-2">
-      {resumeData.projects.map((proj) => (
-        <div key={proj.id} className="group flex flex-col bg-white border border-archive-border/10 p-8 shadow-sm hover:shadow-xl hover:border-archive-border transition-all duration-500">
-          <div className="aspect-video bg-gray-200 mb-8 overflow-hidden relative border border-archive-border/5">
-            <img src={proj.image} alt={proj.title} className="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-               <div className="p-4 bg-white rounded-full translate-y-4 group-hover:translate-y-0 transition-transform">
-                 <ExternalLink size={24} className="text-archive-border" />
-               </div>
+    <div className="projects-panel-shell">
+      {selectedProject && (
+        <ProjectDetailSection
+          project={selectedProject}
+          onClose={onProjectClose}
+          onPreviewPhoto={onPreviewPhoto}
+        />
+      )}
+
+      <div className="projects-panel-list">
+        {resumeData.projects.map((proj, index) => {
+          const canOpenDetail = Boolean(proj.detailImages?.length);
+
+          return (
+            <button
+              key={proj.id}
+              type="button"
+              onClick={() => canOpenDetail && onProjectSelect(proj.id)}
+              className={`project-cute-card group ${index === 0 ? 'project-cute-card--featured' : ''}`}
+              aria-label={canOpenDetail ? `查看${proj.title}详情` : proj.title}
+            >
+              <div className="project-cute-image">
+                <img src={proj.image} alt={proj.title} />
+                {canOpenDetail && (
+                  <div className="project-cute-hover">
+                    <ExternalLink size={22} />
+                  </div>
+                )}
+              </div>
+              <div className="project-cute-body">
+                <div>
+                  <span className="project-cute-count">0{index + 1}</span>
+                  <h4>{proj.title}</h4>
+                </div>
+                <p>{proj.description}</p>
+              </div>
+              <div className="project-cute-tags">
+                {proj.tags.map(tag => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
+              {canOpenDetail && (
+                <div className="project-cute-open">
+                  <span>查看小程序详情</span>
+                  <ChevronRight size={16} />
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ProjectDetailSection({
+  project,
+  onClose,
+  onPreviewPhoto,
+}: {
+  project: Project;
+  onClose: () => void;
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+}) {
+  return (
+    <motion.section
+      className="project-detail-section"
+      initial={{ opacity: 0, y: 26 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="project-detail-toolbar">
+        <span>Mini Program Detail</span>
+        <button type="button" onClick={onClose}>返回作品列表</button>
+      </div>
+
+      <div className="project-detail-copy">
+        <span className="project-detail-kicker">Cookie Diary</span>
+        <h4>{project.title}</h4>
+        <p>{project.detailIntro ?? project.description}</p>
+        <div className="project-detail-tags">
+          {project.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="project-detail-gallery">
+        {project.detailImages?.map((image, index) => (
+          <motion.button
+            type="button"
+            className="project-detail-thumb"
+            key={image}
+            onClick={() => onPreviewPhoto({ src: image, title: `${project.title}详情图 ${index + 1}` })}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.04, duration: 0.28 }}
+            aria-label={`放大查看${project.title}详情图 ${index + 1}`}
+          >
+            <img src={image} alt={`${project.title}详情图 ${index + 1}`} />
+            <span>{String(index + 1).padStart(2, '0')}</span>
+          </motion.button>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+function ProjectDetailFlipOverlay({
+  project,
+  onClose,
+  onPreviewPhoto,
+}: {
+  project: Project | null;
+  onClose: () => void;
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+}) {
+  return (
+    <AnimatePresence>
+      {project && (
+        <motion.div
+          className="project-detail-flip-stage custom-scrollbar-minimal"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            className="project-detail-turning-page"
+            initial={{ rotateY: 0, opacity: 1 }}
+            animate={{ rotateY: -178, opacity: 0.96 }}
+            exit={{ rotateY: 0, opacity: 1 }}
+            transition={{ duration: 0.74, ease: [0.18, 0.92, 0.2, 1] }}
+            aria-hidden="true"
+          />
+          <motion.div
+            className="project-detail-page"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ delay: 0.38, duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="project-detail-toolbar">
+              <button type="button" onClick={onClose} aria-label="返回作品列表">
+                <ArrowLeft size={18} />
+                <span>返回作品</span>
+              </button>
+              <span>Mini Program File</span>
             </div>
+
+            <section className="project-detail-hero">
+              <div className="project-detail-copy">
+                <span className="project-detail-kicker">Cookie Diary</span>
+                <h4>{project.title}</h4>
+                <p>{project.detailIntro ?? project.description}</p>
+                <div className="project-detail-tags">
+                  {project.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="project-detail-gallery">
+              {project.detailImages?.map((image, index) => (
+                <motion.button
+                  type="button"
+                  className="project-detail-thumb"
+                  key={image}
+                  onClick={() => onPreviewPhoto({ src: image, title: `${project.title}详情图 ${index + 1}` })}
+                  initial={{ opacity: 0, y: 28 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.12 + index * 0.06, duration: 0.36 }}
+                  aria-label={`放大查看${project.title}详情图 ${index + 1}`}
+                >
+                  <img src={image} alt={`${project.title}详情图 ${index + 1}`} />
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                </motion.button>
+              ))}
+            </section>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function FullCorkboardProjectsPage({
+  selectedProjectId,
+  onProjectSelect,
+  onProjectClose,
+  onPreviewPhoto,
+}: {
+  selectedProjectId: string | null;
+  onProjectSelect: (projectId: string) => void;
+  onProjectClose: () => void;
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+}) {
+  return (
+    <motion.div
+      layoutId="PROJECTS"
+      className="project-cork-full-page"
+      initial={{ opacity: 0, y: 34, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="bg-[#D4DEE5] folder-tab final-folder-tab">
+        03_作品
+      </div>
+      <div className="project-cork-full-frame">
+        <div className="project-cork-full-surface custom-scrollbar-minimal">
+          <div className="project-cork-label">
+            <span>Project Corkboard</span>
+            <button type="button" onClick={onProjectClose}>清空展开</button>
           </div>
-          <div className="flex-1 space-y-4">
-            <h4 className="text-2xl font-bold tracking-tight">{proj.title}</h4>
-            <p className="text-sm leading-relaxed text-archive-border/60">{proj.description}</p>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-10">
-            {proj.tags.map(tag => (
-              <span key={tag} className="text-[10px] font-mono border border-archive-border/20 px-3 py-1 uppercase tracking-widest group-hover:bg-archive-border group-hover:text-white transition-all">
-                {tag}
-              </span>
-            ))}
+
+          <div className="project-cork-column">
+            {resumeData.projects.map((project, index) => {
+              const isOpen = project.id === selectedProjectId;
+              const projectImages = [
+                ...(project.image ? [project.image] : []),
+                ...(project.detailImages ?? []),
+              ];
+
+              return (
+                <motion.section
+                  key={project.id}
+                  className={`project-cork-item project-cork-item--${index + 1} ${isOpen ? 'project-cork-item--open' : ''}`}
+                  initial={{ opacity: 0, y: 24, scale: 0.94 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: index * 0.07, duration: 0.34 }}
+                >
+                  <motion.button
+                    type="button"
+                    className={`project-cork-ticket ${isOpen ? 'project-cork-ticket--active' : ''}`}
+                    onClick={() => onProjectSelect(project.id)}
+                    drag
+                    dragMomentum={false}
+                    whileDrag={{ scale: 1.03, zIndex: 100 }}
+                  >
+                    <span className="cork-pin" aria-hidden="true" />
+                    <span className="cork-project-index">0{index + 1}</span>
+                    <strong>{project.title}</strong>
+                    <p>{project.description}</p>
+                    <em>{isOpen ? '已展开素材' : '点击展开素材'}</em>
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        className="project-cork-photo-grid"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.26 }}
+                      >
+                        {projectImages.map((image, imageIndex) => (
+                          <motion.button
+                            key={`${project.id}-${image}`}
+                            type="button"
+                            drag
+                            dragMomentum={false}
+                            className="project-cork-photo project-cork-photo--grid"
+                            initial={{ opacity: 0, scale: 0.92 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.92 }}
+                            transition={{ delay: imageIndex * 0.035, duration: 0.22 }}
+                            whileDrag={{ scale: 1.04, zIndex: 110 }}
+                            onClick={() => onPreviewPhoto({ src: image, title: `${project.title} 图片 ${imageIndex + 1}` })}
+                          >
+                            <span className="cork-thumb-pin" aria-hidden="true" />
+                            <img src={image} alt={`${project.title} 图片 ${imageIndex + 1}`} />
+                            <span>{String(imageIndex + 1).padStart(2, '0')}</span>
+                          </motion.button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.section>
+              );
+            })}
           </div>
         </div>
-      ))}
+      </div>
+    </motion.div>
+  );
+}
+function CorkboardProjectsView({
+  selectedProjectId,
+  onProjectSelect,
+  onProjectClose,
+  onPreviewPhoto,
+}: {
+  selectedProjectId: string | null;
+  onProjectSelect: (projectId: string) => void;
+  onProjectClose: () => void;
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+}) {
+  const selectedProject = resumeData.projects.find((project) => project.id === selectedProjectId) ?? resumeData.projects[0];
+  const scatteredImages = [
+    ...(selectedProject.image ? [selectedProject.image] : []),
+    ...(selectedProject.detailImages ?? []),
+  ];
+  const positions = [
+    { left: '4%', top: '10%', rotate: -8 },
+    { left: '57%', top: '5%', rotate: 6 },
+    { left: '70%', top: '34%', rotate: -4 },
+    { left: '9%', top: '45%', rotate: 5 },
+    { left: '38%', top: '57%', rotate: -6 },
+    { left: '58%', top: '66%', rotate: 4 },
+    { left: '25%', top: '20%', rotate: 3 },
+  ];
+
+  return (
+    <div className="cork-project-board">
+      <div className="cork-board-frame">
+        <div className="cork-board-surface">
+          <div className="cork-board-title">
+            <span>Project Corkboard</span>
+            <button type="button" onClick={onProjectClose}>清空展开</button>
+          </div>
+
+          <div className="cork-note-stack">
+            {resumeData.projects.map((project, index) => {
+              const isActive = project.id === selectedProjectId;
+              const canOpen = Boolean(project.image || project.detailImages?.length);
+
+              return (
+                <motion.button
+                  key={project.id}
+                  type="button"
+                  className={`cork-project-note ${isActive ? 'cork-project-note--active' : ''}`}
+                  onClick={() => canOpen && onProjectSelect(project.id)}
+                  initial={{ opacity: 0, y: 24, rotate: -1 + index * 1.5 }}
+                  animate={{ opacity: 1, y: 0, rotate: -1 + index * 1.5 }}
+                  transition={{ delay: index * 0.08, duration: 0.36 }}
+                  style={{ zIndex: 40 + index }}
+                >
+                  <span className="cork-pin" aria-hidden="true" />
+                  <span className="cork-project-index">0{index + 1}</span>
+                  <strong>{project.title}</strong>
+                  <p>{project.description}</p>
+                  <span className="cork-note-action">点击展开素材</span>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <AnimatePresence>
+            {selectedProjectId && scatteredImages.map((image, index) => {
+              const pos = positions[index % positions.length];
+              return (
+                <motion.button
+                  key={`${selectedProjectId}-${image}`}
+                  type="button"
+                  drag
+                  dragMomentum={false}
+                  className="cork-polaroid-thumb"
+                  style={{ left: pos.left, top: pos.top, rotate: `${pos.rotate}deg`, zIndex: 10 + index }}
+                  initial={{ opacity: 0, scale: 0.72, x: '12%', y: '10%' }}
+                  animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ delay: index * 0.055, duration: 0.3 }}
+                  whileDrag={{ scale: 1.04, zIndex: 90 }}
+                  onClick={() => onPreviewPhoto({ src: image, title: `${selectedProject.title} 图片 ${index + 1}` })}
+                  aria-label={`放大查看${selectedProject.title}图片 ${index + 1}`}
+                >
+                  <span className="cork-thumb-pin" aria-hidden="true" />
+                  <img src={image} alt={`${selectedProject.title}图片 ${index + 1}`} />
+                  <span className="cork-thumb-caption">{String(index + 1).padStart(2, '0')}</span>
+                </motion.button>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 }
@@ -616,10 +1145,10 @@ function ProjectsView() {
 function HobbiesView() {
   return (
     <div className="grid gap-10 md:grid-cols-2">
-      {hobbyData.map((hobby, i) => {
+      {hobbyData.map((hobby) => {
         const Icon = HobbyIcons[hobby.icon];
         return (
-          <div key={i} className="p-10 bg-archive-bg/20 border border-archive-border/10 hover:border-archive-border hover:bg-white transition-all group flex flex-col items-center text-center">
+          <div key={hobby.title} className="p-10 bg-archive-bg/20 border border-archive-border/10 hover:border-archive-border hover:bg-white transition-all group flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-full bg-white border border-archive-border/10 flex items-center justify-center mb-8 shadow-sm group-hover:rotate-12 transition-transform">
               <Icon size={32} strokeWidth={1} className="text-archive-border/60 group-hover:text-archive-border transition-colors" />
             </div>
@@ -636,9 +1165,10 @@ function HobbiesView() {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <h3 className="text-xs font-mono uppercase tracking-[0.3em] text-archive-border/40 mb-10 flex items-center gap-6">
+    <h3 className="text-xs font-mono uppercase tracking-[0.3em] text-archive-border/45 mb-5 flex items-center gap-5">
       {title}
       <span className="flex-1 h-[1px] bg-archive-border/10" />
     </h3>
   );
 }
+
