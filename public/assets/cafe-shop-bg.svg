@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1003 565" role="img" aria-label="Cafe shop chalkboard background">
+  <defs>
+    <radialGradient id="coffee" cx="50%" cy="52%" r="62%">
+      <stop offset="0%" stop-color="#6a3c25"/>
+      <stop offset="58%" stop-color="#4a2919"/>
+      <stop offset="100%" stop-color="#28150d"/>
+    </radialGradient>
+    <filter id="chalk">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.7"/>
+    </filter>
+    <style>
+      .line{fill:none;stroke:#fff9ee;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:url(#chalk)}
+      .thin{fill:none;stroke:#fff9ee;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:url(#chalk)}
+      .txt{fill:#fff9ee;font-family:Georgia,serif;font-weight:700;letter-spacing:4px;filter:url(#chalk)}
+      .menu{fill:#fff9ee;font-family:Georgia,serif;font-style:italic;letter-spacing:1px;filter:url(#chalk)}
+    </style>
+  </defs>
+
+  <rect width="1003" height="565" fill="url(#coffee)"/>
+  <path d="M0 0h1003v565H0z" fill="#1b100b" opacity=".18"/>
+  <path class="thin" opacity=".18" d="M166 96c119-15 213-28 323-3M511 108c154-26 300-8 434 5M322 335c148-26 303-22 469-7"/>
+  <path class="thin" opacity=".14" d="M229 202c151 10 326 15 512-7M208 391c175 11 367 5 578-13"/>
+
+  <path class="line" d="M18 548V52c27-1 34-17 35-34h898c2 24 13 35 35 37v493H18z"/>
+  <path class="thin" d="M28 538V60c25-3 36-15 38-32h420M545 28h395c4 21 15 31 36 33v477H28"/>
+
+  <path class="thin" d="M62 98h320M605 98h320"/>
+  <path class="line" d="M154 98v244M817 98v252"/>
+
+  <g transform="translate(46 65)">
+    <path class="line" d="M0 24h34c7 0 10 15-1 18H0zM35 28h14c7 2 4 16-8 17"/>
+    <path class="line" d="M54 21h34c7 0 10 15-1 18H54zM89 25h14c7 2 4 16-8 17"/>
+    <path class="line" d="M110 22c25-1 42 4 46 17-18 4-34 5-52 2"/>
+    <path class="line" d="M185 3h30l8 60h-47zM194 16h17"/>
+    <path class="line" d="M240 3h30l8 60h-47zM250 16h13"/>
+    <path class="line" d="M318 18h45M330 18c0 27 29 27 32 0M342 4v14"/>
+    <path class="thin" d="M14 45h32M69 43h30M121 43h38M179 66h110M315 66h66"/>
+  </g>
+
+  <g transform="translate(404 38)">
+    <path class="line" d="M85 12c-49 6-83 22-106 44l20 15-17 34 54-22c57 12 111 12 169 0l54 22-17-34 20-15c-24-22-58-38-106-44-23-3-47-3-71 0z"/>
+    <text class="txt" x="33" y="58" font-size="42">CAFE</text>
+    <text class="txt" x="61" y="88" font-size="23">SHOP</text>
+    <path class="thin" d="M93-16c-12 15 9 20 0 35M122-16c-12 15 9 20 0 35M151-16c-12 15 9 20 0 35"/>
+  </g>
+
+  <g transform="translate(658 58)">
+    <path class="line" d="M0 35h45M10 35c0 29 28 29 31 0M22 18v17"/>
+    <path class="line" d="M69 35h45M79 35c0 29 28 29 31 0M91 18v17"/>
+    <path class="line" d="M132 18h48v63h-48zM153 42c12 0 20 7 20 17-11 8-27 8-40 0 1-10 9-17 20-17z"/>
+    <path class="line" d="M204 50c24-1 40 4 44 17-18 5-34 5-51 2"/>
+    <path class="line" d="M266 12h16l5 70h-26zM303 12h16l5 70h-26z"/>
+    <path class="thin" d="M-12 84h345"/>
+  </g>
+
+  <g transform="translate(36 151)">
+    <path class="line" d="M0 0h125M13 0v158M112 0v158"/>
+    <path class="thin" d="M13 0c11 11 21 11 33 0 13 12 25 11 37 0 11 11 20 11 29 0"/>
+    <path class="line" d="M22 31c20 24 20 84 2 127M104 31c-22 24-22 84 0 127"/>
+    <path class="line" d="M152 63c4-30 41-30 45 0zM168 63v35M178 63v35"/>
+    <path class="line" d="M42 229c0-33 57-33 57 0M30 229h80M61 229v120M75 229v120M24 348h90"/>
+    <path class="line" d="M135 212c0-37 67-37 67 0M124 212h88M158 212v133M175 212v133M117 345h103"/>
+    <path class="line" d="M95 347c-18-81-4-130 59-147"/>
+    <path class="line" d="M202 250c0-20 18-36 36-36v116c-18 0-36-14-36-34"/>
+    <path class="line" d="M6 258c0-22 18-39 38-39v124C24 343 6 326 6 304z"/>
+  </g>
+
+  <g transform="translate(210 170)">
+    <path class="thin" d="M0 0h74M0 64h120M0 127h118"/>
+    <path class="line" d="M7 41c18-1 31 4 34 13-14 4-26 4-39 1M49 38c17-1 29 3 32 12-13 4-24 4-37 1M90 38c16-1 28 3 31 12-12 4-24 4-36 1"/>
+    <path class="line" d="M7 83h22l6 33H2zM43 83h22l6 33H38zM80 83h22l6 33H75z"/>
+    <path class="thin" d="M16 91h10M52 91h10M89 91h10"/>
+  </g>
+
+  <g transform="translate(748 143)">
+    <path class="line" d="M0 0h126v136H0z"/>
+    <text class="menu" x="34" y="30" font-size="20">Menu</text>
+    <path class="thin" d="M28 50h72M26 68h76M28 86h65M26 104h71"/>
+    <path class="line" d="M172-1h21v78h-21zM212-1h21v78h-21zM160 80h87M150 110h112"/>
+  </g>
+
+  <g transform="translate(695 290)">
+    <path class="line" d="M0 102h262M22 43h146v59H22zM60 43v-21h64v21"/>
+    <path class="line" d="M160 43c2-63 87-61 90 0v59h-90z"/>
+    <path class="line" d="M0 102v53M262 102v53"/>
+    <path class="line" d="M91 66c17 0 33 0 49-5M47 62h26M192 68h35"/>
+    <path class="line" d="M130-40c40 17 42 63 12 89M130-40c-10 30-5 62 12 89"/>
+    <path class="line" d="M182-34c-24 9-32 31-22 56M182-34c7 19-1 38-22 56"/>
+    <path class="line" d="M62 31h-24l-6-31h36zM38 0h25M212 18h42v84h-42z"/>
+    <path class="line" d="M-2 142c0-38 72-38 72 0v70H-2zM174 142c0-38 72-38 72 0v70h-72zM66 158c0-27 62-27 62 0M58 158h78M92 158v62"/>
+  </g>
+
+  <g transform="translate(245 505)">
+    <path class="thin" d="M0 44h530M21 0L0 44M61 0 40 44M101 0 80 44M141 0l-21 44M181 0l-21 44M221 0l-21 44M261 0l-21 44M301 0l-21 44M341 0l-21 44M381 0l-21 44M421 0l-21 44M461 0l-21 44M501 0l-21 44"/>
+  </g>
+</svg>
