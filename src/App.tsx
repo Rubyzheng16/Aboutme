@@ -52,9 +52,46 @@ function OptimizedImage({
   loading = 'lazy',
   decoding = 'async',
   draggable = false,
+  src,
+  sizes = '(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 960px',
   ...props
 }: ImgHTMLAttributes<HTMLImageElement>) {
-  return <img loading={loading} decoding={decoding} draggable={draggable} {...props} />;
+  const optimized = getOptimizedImageSources(src);
+
+  return (
+    <img
+      loading={loading}
+      decoding={decoding}
+      draggable={draggable}
+      src={optimized.src ?? src}
+      srcSet={optimized.srcSet}
+      sizes={optimized.srcSet ? sizes : undefined}
+      {...props}
+    />
+  );
+}
+
+function getOptimizedImageSources(src: ImgHTMLAttributes<HTMLImageElement>['src']) {
+  if (!src || !src.startsWith('/assets/') || src.includes('/optimized/')) {
+    return { src, srcSet: undefined };
+  }
+
+  const filename = src.split('/').pop();
+  if (!filename || !/\.(jpe?g|png)$/i.test(filename)) {
+    return { src, srcSet: undefined };
+  }
+
+  const baseName = filename.replace(/\.[^.]+$/, '');
+  const optimizedBase = `/assets/optimized/${baseName}`;
+
+  return {
+    src: `${optimizedBase}-display.webp`,
+    srcSet: [
+      `${optimizedBase}-thumb.webp 480w`,
+      `${optimizedBase}-display.webp 960w`,
+      `${optimizedBase}-large.webp 1440w`,
+    ].join(', '),
+  };
 }
 
 export default function App() {
@@ -1066,7 +1103,7 @@ function FullCorkboardProjectsPage({
                         project.id === 'y-navigation' ? (
                           <div className="ccd-card">
                             <div className="ccd-screen">
-                              <video src={project.video} controls preload="metadata" />
+                              <video src={project.video} controls preload="none" />
                             </div>
                             <OptimizedImage className="ccd-camera-shell" src="/assets/y-navigation-ccd-frame.png" alt="Canon CCD 相机外框" />
                           </div>
@@ -1082,7 +1119,7 @@ function FullCorkboardProjectsPage({
                               )}
                             </div>
                             <div className="circuit-video-screen">
-                              <video src={project.video} controls preload="metadata" />
+                              <video src={project.video} controls preload="none" />
                             </div>
                             <span className="circuit-chip circuit-chip--left" aria-hidden="true" />
                             <span className="circuit-chip circuit-chip--right" aria-hidden="true" />

@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "optimize:assets": "node scripts/optimize-assets.mjs",
+    "optimize:images": "node scripts/optimize-assets.mjs --images-only",
+    "optimize:videos": "node scripts/optimize-assets.mjs --videos-only"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
