@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
+import type { ImgHTMLAttributes } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowLeft,
@@ -11,7 +12,6 @@ import {
   Disc3,
   ExternalLink,
   FileText,
-  Github,
   GraduationCap,
   Heart,
   Layers,
@@ -47,6 +47,15 @@ const FOLDER_BACKDROPS: Record<FolderId, string> = {
   PROJECTS: '#202b32',
   HOBBIES: '#32252d',
 };
+
+function OptimizedImage({
+  loading = 'lazy',
+  decoding = 'async',
+  draggable = false,
+  ...props
+}: ImgHTMLAttributes<HTMLImageElement>) {
+  return <img loading={loading} decoding={decoding} draggable={draggable} {...props} />;
+}
 
 export default function App() {
   const [activeFolderId, setActiveFolderId] = useState<FolderId | null>(null);
@@ -218,15 +227,6 @@ export default function App() {
             exit={{ opacity: 0, y: 50 }}
             className="mt-16 flex flex-col items-center gap-6"
           >
-            <a
-              href="https://github.com/ln-dev7/square-ui"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 group px-4 py-2 border border-archive-border/10 hover:border-archive-border/40 transition-all rounded-full bg-white/40"
-            >
-              <Github size={20} strokeWidth={1.5} />
-              <span className="text-xs font-mono opacity-50 group-hover:opacity-100 transition-opacity">/ln-dev7/square-ui</span>
-            </a>
             <p className="text-[10px] font-mono opacity-30 uppercase tracking-[0.4em]">
               ZHENG HAO Archive System 路 2026
             </p>
@@ -577,7 +577,7 @@ function PhotoSticky({
       className={`absolute bg-white p-3 shadow-[0_18px_40px_rgba(0,0,0,0.14)] border border-black/10 cursor-grab active:cursor-grabbing ${className}`}
     >
       <div className="overflow-hidden bg-[#e8eef4] border border-black/5">
-        <img src={src} alt={label} className={`w-full h-full ${imageClassName}`} />
+        <OptimizedImage src={src} alt={label} className={`w-full h-full ${imageClassName}`} />
       </div>
       <div className="pt-3 flex items-center justify-between">
         <span className="text-[10px] font-mono tracking-[0.3em] text-archive-border/45">{label}</span>
@@ -664,7 +664,7 @@ function ExperiencePhotoBoard({ onPreviewPhoto }: { onPreviewPhoto: (photo: { sr
                   onClick={() => onPreviewPhoto({ src: photo, title: `${group.title} 0${index + 1}` })}
                   className="experience-photo-tile"
                 >
-                  <img src={photo} alt={`${group.title} ${index + 1}`} />
+                  <OptimizedImage src={photo} alt={`${group.title} ${index + 1}`} />
                 </motion.button>
               ))}
             </div>
@@ -706,7 +706,7 @@ function PhotoPreview({
                 <X size={18} />
               </button>
             </div>
-            <img src={preview.src} alt={preview.title} />
+            <OptimizedImage src={preview.src} alt={preview.title} />
           </motion.div>
         </motion.div>
       )}
@@ -794,7 +794,7 @@ function ProjectsView({
             >
               <div className="project-cute-image">
                 {proj.image ? (
-                  <img src={proj.image} alt={proj.title} />
+                  <OptimizedImage src={proj.image} alt={proj.title} />
                 ) : (
                   <div className="project-cute-image-fallback">
                     <Code2 size={34} />
@@ -877,7 +877,7 @@ function ProjectDetailSection({
             transition={{ delay: index * 0.04, duration: 0.28 }}
             aria-label={`放大查看${project.title}详情图 ${index + 1}`}
           >
-            <img src={image} alt={`${project.title}详情图 ${index + 1}`} />
+            <OptimizedImage src={image} alt={`${project.title}详情图 ${index + 1}`} />
             <span>{String(index + 1).padStart(2, '0')}</span>
           </motion.button>
         ))}
@@ -953,7 +953,7 @@ function ProjectDetailFlipOverlay({
                   transition={{ delay: 0.12 + index * 0.06, duration: 0.36 }}
                   aria-label={`放大查看${project.title}详情图 ${index + 1}`}
                 >
-                  <img src={image} alt={`${project.title}详情图 ${index + 1}`} />
+                  <OptimizedImage src={image} alt={`${project.title}详情图 ${index + 1}`} />
                   <span>{String(index + 1).padStart(2, '0')}</span>
                 </motion.button>
               ))}
@@ -1006,7 +1006,7 @@ function FullCorkboardProjectsPage({
             whileHover={{ y: -4, rotate: 0 }}
           >
             <span className="cork-pin xhs-cork-pin" aria-hidden="true" />
-            <img src="/assets/ruby-xhs-qr.jpg" alt="Ruby 露比小红书二维码" />
+            <OptimizedImage src="/assets/ruby-xhs-qr.jpg" alt="Ruby 露比小红书二维码" />
             <div className="xhs-cork-copy">
               <span>小红书作品主页</span>
               <strong>Ruby 露比</strong>
@@ -1068,7 +1068,7 @@ function FullCorkboardProjectsPage({
                             <div className="ccd-screen">
                               <video src={project.video} controls preload="metadata" />
                             </div>
-                            <img className="ccd-camera-shell" src="/assets/y-navigation-ccd-frame.png" alt="Canon CCD 相机外框" />
+                            <OptimizedImage className="ccd-camera-shell" src="/assets/y-navigation-ccd-frame.png" alt="Canon CCD 相机外框" />
                           </div>
                         ) : (
                           <div className="circuit-video-card">
@@ -1105,7 +1105,7 @@ function FullCorkboardProjectsPage({
                               onClick={() => onPreviewPhoto({ src: image, title: `${project.title} 图片 ${imageIndex + 1}` })}
                             >
                               <span className="cork-thumb-pin" aria-hidden="true" />
-                              <img src={image} alt={`${project.title} 图片 ${imageIndex + 1}`} />
+                              <OptimizedImage src={image} alt={`${project.title} 图片 ${imageIndex + 1}`} />
                               <span>{String(imageIndex + 1).padStart(2, '0')}</span>
                             </motion.button>
                           ))}
@@ -1155,7 +1155,7 @@ function FullCorkboardProjectsPage({
                   whileHover={{ y: -6, rotate: 0 }}
                 >
                   <span className="cork-thumb-pin" aria-hidden="true" />
-                  <img src={project.image} alt={`${project.title}封面`} />
+                  <OptimizedImage src={project.image} alt={`${project.title}封面`} />
                   <div className="more-project-card-copy">
                     <div>
                       <strong>{project.title}</strong>
@@ -1256,7 +1256,7 @@ function CorkboardProjectsView({
                   aria-label={`放大查看${selectedProject.title}图片 ${index + 1}`}
                 >
                   <span className="cork-thumb-pin" aria-hidden="true" />
-                  <img src={image} alt={`${selectedProject.title}图片 ${index + 1}`} />
+                  <OptimizedImage src={image} alt={`${selectedProject.title}图片 ${index + 1}`} />
                   <span className="cork-thumb-caption">{String(index + 1).padStart(2, '0')}</span>
                 </motion.button>
               );
@@ -1352,7 +1352,7 @@ function FullCdHobbiesPage({
                 </span>
                 <span className="hobby-cd-disc" aria-hidden="true">
                   <span className="hobby-cd-disc-art">
-                    <img src={scene.image} alt="" />
+                    <OptimizedImage src={scene.image} alt="" />
                   </span>
                   <span className="hobby-cd-hole" />
                 </span>
@@ -1401,7 +1401,7 @@ function FullCdHobbiesPage({
                   onClick={() => onPreviewPhoto({ src: activeImage, title: `${selectedHobby.title} 图片 ${activeGalleryIndex + 1}` })}
                   aria-label={`放大查看${selectedHobby.title}主图`}
                 >
-                  <img src={activeImage} alt={selectedHobby.title} />
+                  <OptimizedImage src={activeImage} alt={selectedHobby.title} />
                 </button>
               </motion.div>
             </AnimatePresence>
@@ -1449,7 +1449,7 @@ function FullCdHobbiesPage({
                 aria-label={`切换到${selectedHobby.title}图片 ${index + 1}`}
                 aria-pressed={index === activeGalleryIndex}
               >
-                <img src={image} alt={`${selectedHobby.title}图片 ${index + 1}`} />
+                <OptimizedImage src={image} alt={`${selectedHobby.title}图片 ${index + 1}`} />
                 <span>{String(index + 1).padStart(2, '0')}</span>
               </button>
             ))}
@@ -1513,3 +1513,4 @@ function SectionHeader({ title }: { title: string }) {
     </h3>
   );
 }
+

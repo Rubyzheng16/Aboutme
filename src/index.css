@@ -2942,3 +2942,27 @@
     flex-direction: column;
   }
 }
+
+@media (prefers-reduced-motion: reduce), (update: slow) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hobby-projector-disc {
+    animation: none;
+  }
+
+  .photo-preview-overlay {
+    backdrop-filter: none;
+  }
+
+  .book-open-spread,
+  .book-open-turning-cover,
+  .folder-3d-depth {
+    transform-style: flat;
+  }
+}
