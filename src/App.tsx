@@ -616,7 +616,7 @@ function ExperiencePhotoBoard({ onPreviewPhoto }: { onPreviewPhoto: (photo: { sr
   const groups = [
     {
       title: 'Japan Product Talk',
-      subtitle: '鍟嗗姟浠ｈ〃 / 浜у搧璁茶В',
+      subtitle: '商务代表 / 产品讲解',
       photos: [
         '/assets/exp-japan-01.jpg',
         '/assets/exp-japan-02.jpg',
@@ -1513,4 +1513,3 @@ function SectionHeader({ title }: { title: string }) {
     </h3>
   );
 }
-
