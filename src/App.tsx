@@ -8,6 +8,7 @@ import {
   Camera,
   ChevronRight,
   Code2,
+  Disc3,
   ExternalLink,
   FileText,
   Github,
@@ -20,6 +21,7 @@ import {
   Music,
   Palette,
   Phone,
+  Play,
   Sparkles,
   Star,
   UserRound,
@@ -164,7 +166,6 @@ export default function App() {
               className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden pt-10 md:pt-20"
               style={{ backgroundColor: FOLDER_BACKDROPS[activeFolderId] }}
             >
-              {activeFolderId === 'PROFILE_EDU' && <FloatingEmojiField />}
               <div className="relative w-full max-w-7xl flex flex-col items-center">
                 <motion.button
                   initial={{ opacity: 0, scale: 0.5 }}
@@ -185,6 +186,8 @@ export default function App() {
                     onProjectClose={() => setSelectedProjectId(null)}
                     onPreviewPhoto={setPreviewPhoto}
                   />
+                ) : activeFolderId === 'HOBBIES' ? (
+                  <FullCdHobbiesPage onPreviewPhoto={setPreviewPhoto} />
                 ) : (
                   <>
                     {detailPhase !== 'extract' && (
@@ -230,40 +233,6 @@ export default function App() {
           </motion.footer>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
-
-function FloatingEmojiField() {
-  const emojis = ['*', '+', 'cake', 'note', 'star', 'heart', 'pin', 'tag', 'memo'];
-  const floaters = Array.from({ length: 24 }, (_, index) => ({
-    id: index,
-    side: index % 2 === 0 ? 'left' : 'right',
-    offset: 10 + ((index * 23) % 68),
-    delay: (index % 12) * -0.95,
-    duration: 7 + (index % 6) * 0.75,
-    size: 17 + (index % 5) * 4,
-    rotate: -24 + (index % 7) * 10,
-    symbol: emojis[index % emojis.length],
-  }));
-
-  return (
-    <div className="floating-emoji-field" aria-hidden="true">
-      {floaters.map((item) => (
-        <span
-          key={item.id}
-          className={`floating-emoji floating-emoji--${item.side}`}
-          style={{
-            ...(item.side === 'left' ? { left: `${item.offset}%` } : { right: `${item.offset}%` }),
-            fontSize: `${item.size}px`,
-            animationDelay: `${item.delay}s`,
-            animationDuration: `${item.duration}s`,
-            transform: `rotate(${item.rotate}deg)`,
-          }}
-        >
-          {item.symbol}
-        </span>
-      ))}
     </div>
   );
 }
@@ -515,6 +484,11 @@ function LeftProfileBoard() {
             />
           </div>
         ))}
+        <StationerySticker kind="paperclip" className="left-[2%] top-[5%] rotate-[-18deg] z-50" delay={0.42} />
+        <StationerySticker kind="paperclip" className="left-[31%] top-[54%] rotate-[20deg] z-50" delay={0.5} />
+        <StationerySticker kind="binder" className="left-[68%] top-[10%] rotate-[8deg] z-50" delay={0.46} />
+        <StationerySticker kind="star-pin" className="left-[3%] top-[39%] rotate-[-10deg] z-50" delay={0.54} />
+        <StationerySticker kind="star-pin" className="left-[75%] top-[47%] rotate-[12deg] z-50" delay={0.58} />
         <DraggableNote
           text="前端开发 / 数据分析 / AI 产品复盘 / 内容运营"
           color="bg-[#fff0a8]"
@@ -540,6 +514,42 @@ function LeftProfileBoard() {
         </motion.div>
       </motion.div>
     </div>
+  );
+}
+
+function StationerySticker({
+  kind,
+  className,
+  delay,
+}: {
+  kind: 'paperclip' | 'binder' | 'star-pin';
+  className: string;
+  delay: number;
+}) {
+  return (
+    <motion.div
+      drag
+      dragMomentum={false}
+      initial={{ opacity: 0, y: 30, scale: 0.92 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay, duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+      whileDrag={{ scale: 1.08, zIndex: 120 }}
+      className={`stationery-sticker stationery-sticker--${kind} ${className}`}
+      aria-hidden="true"
+    >
+      {kind === 'paperclip' && <span className="paperclip-shape" />}
+      {kind === 'binder' && (
+        <span className="binder-clip-shape">
+          <i />
+          <b />
+        </span>
+      )}
+      {kind === 'star-pin' && (
+        <span className="star-pin-shape">
+          <Sparkles size={18} strokeWidth={2.3} />
+        </span>
+      )}
+    </motion.div>
   );
 }
 
@@ -618,7 +628,7 @@ function ExperiencePhotoBoard({ onPreviewPhoto }: { onPreviewPhoto: (photo: { sr
       subtitle: '中科院实习 / Unity 实验',
       photos: [
         '/assets/exp-siat-01.jpg',
-        '/assets/exp-siat-02.jpg',
+        '/assets/exp-siat-dashboard.png',
         '/assets/exp-siat-03.jpg',
       ],
     },
@@ -783,7 +793,14 @@ function ProjectsView({
               aria-label={canOpenDetail ? `查看${proj.title}详情` : proj.title}
             >
               <div className="project-cute-image">
-                <img src={proj.image} alt={proj.title} />
+                {proj.image ? (
+                  <img src={proj.image} alt={proj.title} />
+                ) : (
+                  <div className="project-cute-image-fallback">
+                    <Code2 size={34} />
+                    <span>{proj.title}</span>
+                  </div>
+                )}
                 {canOpenDetail && (
                   <div className="project-cute-hover">
                     <ExternalLink size={22} />
@@ -978,6 +995,29 @@ function FullCorkboardProjectsPage({
             <button type="button" onClick={onProjectClose}>清空展开</button>
           </div>
 
+          <motion.a
+            href="https://xhslink.com/m/8aJr9Yj1r1A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="xhs-cork-card"
+            initial={{ opacity: 0, y: 18, rotate: -1.2 }}
+            animate={{ opacity: 1, y: 0, rotate: -1.2 }}
+            transition={{ duration: 0.34, delay: 0.08 }}
+            whileHover={{ y: -4, rotate: 0 }}
+          >
+            <span className="cork-pin xhs-cork-pin" aria-hidden="true" />
+            <img src="/assets/ruby-xhs-qr.jpg" alt="Ruby 露比小红书二维码" />
+            <div className="xhs-cork-copy">
+              <span>小红书作品主页</span>
+              <strong>Ruby 露比</strong>
+              <p>@Ruby露比 在小红书收获了 3544 次赞与收藏，点进去查看更多作品。</p>
+              <em>
+                <ExternalLink size={14} />
+                <span>查看 Ta 的主页</span>
+              </em>
+            </div>
+          </motion.a>
+
           <div className="project-cork-column">
             {resumeData.projects.map((project, index) => {
               const isOpen = project.id === selectedProjectId;
@@ -985,6 +1025,7 @@ function FullCorkboardProjectsPage({
                 ...(project.image ? [project.image] : []),
                 ...(project.detailImages ?? []),
               ];
+              const hasVideo = Boolean(project.video);
 
               return (
                 <motion.section
@@ -1006,44 +1047,129 @@ function FullCorkboardProjectsPage({
                     <span className="cork-project-index">0{index + 1}</span>
                     <strong>{project.title}</strong>
                     <p>{project.description}</p>
-                    <em>{isOpen ? '已展开素材' : '点击展开素材'}</em>
+                    <span className="project-cork-preview-hint">
+                      {hasVideo ? '点击播放视频演示' : '点击图片预览详细'}
+                    </span>
+                    <em>{isOpen ? '已展开素材' : hasVideo ? '点击展开放映机' : '点击展开素材'}</em>
                   </motion.button>
 
                   <AnimatePresence>
                     {isOpen && (
-                      <motion.div
-                        className="project-cork-photo-grid"
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.26 }}
-                      >
-                        {projectImages.map((image, imageIndex) => (
-                          <motion.button
-                            key={`${project.id}-${image}`}
-                            type="button"
-                            drag
-                            dragMomentum={false}
-                            className="project-cork-photo project-cork-photo--grid"
-                            initial={{ opacity: 0, scale: 0.92 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.92 }}
-                            transition={{ delay: imageIndex * 0.035, duration: 0.22 }}
-                            whileDrag={{ scale: 1.04, zIndex: 110 }}
-                            onClick={() => onPreviewPhoto({ src: image, title: `${project.title} 图片 ${imageIndex + 1}` })}
-                          >
-                            <span className="cork-thumb-pin" aria-hidden="true" />
-                            <img src={image} alt={`${project.title} 图片 ${imageIndex + 1}`} />
-                            <span>{String(imageIndex + 1).padStart(2, '0')}</span>
-                          </motion.button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    <motion.div
+                      className="project-cork-open-area"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.26 }}
+                    >
+                      {project.video ? (
+                        project.id === 'y-navigation' ? (
+                          <div className="ccd-card">
+                            <div className="ccd-screen">
+                              <video src={project.video} controls preload="metadata" />
+                            </div>
+                            <img className="ccd-camera-shell" src="/assets/y-navigation-ccd-frame.png" alt="Canon CCD 相机外框" />
+                          </div>
+                        ) : (
+                          <div className="circuit-video-card">
+                            <div className="circuit-video-header">
+                              <span>Playable Build Preview</span>
+                              {project.link && (
+                                <a href={project.link} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink size={14} />
+                                  <span>LDJam 页面</span>
+                                </a>
+                              )}
+                            </div>
+                            <div className="circuit-video-screen">
+                              <video src={project.video} controls preload="metadata" />
+                            </div>
+                            <span className="circuit-chip circuit-chip--left" aria-hidden="true" />
+                            <span className="circuit-chip circuit-chip--right" aria-hidden="true" />
+                          </div>
+                        )
+                      ) : (
+                        <div className="project-cork-photo-grid">
+                          {projectImages.map((image, imageIndex) => (
+                            <motion.button
+                              key={`${project.id}-${image}`}
+                              type="button"
+                              drag
+                              dragMomentum={false}
+                              className="project-cork-photo project-cork-photo--grid"
+                              initial={{ opacity: 0, scale: 0.92 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.92 }}
+                              transition={{ delay: imageIndex * 0.035, duration: 0.22 }}
+                              whileDrag={{ scale: 1.04, zIndex: 110 }}
+                              onClick={() => onPreviewPhoto({ src: image, title: `${project.title} 图片 ${imageIndex + 1}` })}
+                            >
+                              <span className="cork-thumb-pin" aria-hidden="true" />
+                              <img src={image} alt={`${project.title} 图片 ${imageIndex + 1}`} />
+                              <span>{String(imageIndex + 1).padStart(2, '0')}</span>
+                            </motion.button>
+                          ))}
+                        </div>
+                      )}
+                      {project.id === 'emotion-cookie' && (
+                        <div className="project-cork-tech-stack">
+                          <h4>技术栈介绍</h4>
+                          <p><strong>前端：</strong>WXML / WXSS / JavaScript，Glass-Easel 组件框架、wx.request 调用。</p>
+                          <p><strong>后端：</strong>Node.js、Express、TypeScript、better-sqlite3、CORS、模块化 services/utils，租用腾讯云进行储存。</p>
+                        </div>
+                      )}
+                      {project.techStack && (
+                        <div className="project-cork-tech-stack project-cork-tech-stack--unity">
+                          <h4>{project.techStack.title}</h4>
+                          <ul>
+                            {project.techStack.items.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 </motion.section>
               );
             })}
           </div>
+
+          <section className="more-projects-section">
+            <div className="more-projects-heading">
+              <span>更多作品</span>
+              <small>Small Web Games</small>
+            </div>
+            <div className="more-projects-grid">
+              {resumeData.moreProjects.map((project, index) => (
+                <motion.a
+                  key={project.id}
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="more-project-card"
+                  initial={{ opacity: 0, y: 22, rotate: index === 0 ? -1.5 : 1.5 }}
+                  animate={{ opacity: 1, y: 0, rotate: index === 0 ? -1.5 : 1.5 }}
+                  transition={{ delay: 0.28 + index * 0.08, duration: 0.32 }}
+                  whileHover={{ y: -6, rotate: 0 }}
+                >
+                  <span className="cork-thumb-pin" aria-hidden="true" />
+                  <img src={project.image} alt={`${project.title}封面`} />
+                  <div className="more-project-card-copy">
+                    <div>
+                      <strong>{project.title}</strong>
+                      <p>{project.description}</p>
+                    </div>
+                    <span className="more-project-play">
+                      <ExternalLink size={14} />
+                      <span>打开游玩</span>
+                    </span>
+                  </div>
+                </motion.a>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </motion.div>
@@ -1142,6 +1268,222 @@ function CorkboardProjectsView({
   );
 }
 
+const HOBBY_CD_SCENES = [
+  {
+    code: 'TRACK 01',
+    label: 'MEDIA LOG',
+    image: '/assets/hobby-media-01.jpg',
+    gallery: ['/assets/hobby-media-01.jpg', '/assets/hobby-media-02.jpg'],
+    stickers: ['DATA', 'POST', '7K'],
+  },
+  {
+    code: 'TRACK 02',
+    label: 'STAGE MIX',
+    image: '/assets/hobby-stage-01.jpg',
+    gallery: ['/assets/hobby-stage-01.jpg', '/assets/hobby-stage-02.jpg', '/assets/hobby-stage-03.jpg', '/assets/hobby-stage-04.jpg'],
+    stickers: ['LIVE', 'PLAN', 'SHOW'],
+  },
+  {
+    code: 'TRACK 03',
+    label: 'CLAY ART',
+    image: '/assets/hobby-clay-01.jpg',
+    gallery: ['/assets/hobby-clay-01.jpg', '/assets/hobby-clay-02.jpg', '/assets/hobby-clay-03.jpg', '/assets/hobby-clay-04.jpg'],
+    stickers: ['HAND', 'COLOR', 'ART'],
+  },
+  {
+    code: 'TRACK 04',
+    label: 'TRAVEL FILM',
+    image: '/assets/hobby-travel-01.jpg',
+    gallery: ['/assets/hobby-travel-01.jpg', '/assets/hobby-travel-02.jpg', '/assets/hobby-travel-03.jpg', '/assets/hobby-travel-04.jpg'],
+    stickers: ['CITY', 'SEA', 'SHOT'],
+  },
+];
+
+function FullCdHobbiesPage({
+  onPreviewPhoto,
+}: {
+  onPreviewPhoto: (photo: { src: string; title: string }) => void;
+}) {
+  const [activeHobbyIndex, setActiveHobbyIndex] = useState(0);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+  const selectedHobby = hobbyData[activeHobbyIndex] ?? hobbyData[0];
+  const selectedScene = HOBBY_CD_SCENES[activeHobbyIndex] ?? HOBBY_CD_SCENES[0];
+  const SelectedIcon = HobbyIcons[selectedHobby.icon] ?? Heart;
+  const activeImage = selectedScene.gallery[activeGalleryIndex] ?? selectedScene.image;
+
+  useEffect(() => {
+    setActiveGalleryIndex(0);
+  }, [activeHobbyIndex]);
+
+  return (
+    <motion.div
+      layoutId="HOBBIES"
+      className="hobby-cd-page"
+      initial={{ opacity: 0, y: 34, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="bg-[#E5D4DE] folder-tab final-folder-tab">
+        04_爱好
+      </div>
+
+      <div className="hobby-cd-shell">
+        <div className="hobby-cd-shelf custom-scrollbar-minimal" aria-label="爱好 CD 列表">
+          {hobbyData.map((hobby, index) => {
+            const Icon = HobbyIcons[hobby.icon] ?? Heart;
+            const scene = HOBBY_CD_SCENES[index] ?? HOBBY_CD_SCENES[0];
+            const isActive = index === activeHobbyIndex;
+
+            return (
+              <motion.button
+                key={hobby.title}
+                type="button"
+                className={`hobby-cd-card hobby-cd-card--${index + 1} ${isActive ? 'hobby-cd-card--active' : ''}`}
+                onClick={() => setActiveHobbyIndex(index)}
+                initial={{ opacity: 0, x: -24, rotate: -2 + index }}
+                animate={{ opacity: 1, x: 0, rotate: -2 + index }}
+                transition={{ delay: index * 0.06, duration: 0.32 }}
+                aria-label={`播放${hobby.title}`}
+              >
+                <span className="hobby-cd-case-shine" aria-hidden="true" />
+                <span className="hobby-cd-spine" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="hobby-cd-disc" aria-hidden="true">
+                  <span className="hobby-cd-disc-art">
+                    <img src={scene.image} alt="" />
+                  </span>
+                  <span className="hobby-cd-hole" />
+                </span>
+                <span className="hobby-cd-copy">
+                  <span>{scene.code}</span>
+                  <strong>{hobby.title}</strong>
+                  <small>{scene.label}</small>
+                </span>
+                <span className="hobby-cd-stickers" aria-hidden="true">
+                  <span>{scene.stickers[0]}</span>
+                  <span>{scene.stickers[1]}</span>
+                  <span>{scene.stickers[2]}</span>
+                </span>
+                <span className="hobby-cd-mini-icon" aria-hidden="true">
+                  <Icon size={18} strokeWidth={1.8} />
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
+
+        <div className="hobby-player-stage">
+          <div className="hobby-player-head">
+            <span>Portable DVD Studio</span>
+            <div className="hobby-player-status">
+              <span className="hobby-status-light" aria-hidden="true" />
+              <span>{selectedScene.code}</span>
+            </div>
+          </div>
+
+          <div className="hobby-screen-shell">
+            <div className="hobby-speaker hobby-speaker--left" aria-hidden="true" />
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedHobby.title}
+                className="hobby-player-window"
+                initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -12, filter: 'blur(8px)' }}
+                transition={{ duration: 0.32 }}
+              >
+                <button
+                  type="button"
+                  className="hobby-player-preview"
+                  onClick={() => onPreviewPhoto({ src: activeImage, title: `${selectedHobby.title} 图片 ${activeGalleryIndex + 1}` })}
+                  aria-label={`放大查看${selectedHobby.title}主图`}
+                >
+                  <img src={activeImage} alt={selectedHobby.title} />
+                </button>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="hobby-speaker hobby-speaker--right" aria-hidden="true" />
+
+            <div className="hobby-screen-brand" aria-hidden="true">
+              <span>malata</span>
+              <span>DVD / AV</span>
+            </div>
+          </div>
+
+          <div className="hobby-console-panel">
+            <div className="hobby-projector-body">
+              <div className="hobby-projector-disc">
+                <Disc3 size={118} strokeWidth={0.8} />
+                <span className="hobby-projector-center">
+                  <SelectedIcon size={26} strokeWidth={1.5} />
+                </span>
+              </div>
+
+              <div className="hobby-projector-copy">
+                <div>
+                  <span>{selectedScene.code}</span>
+                  <h4>{selectedHobby.title}</h4>
+                </div>
+                <p>{selectedHobby.desc}</p>
+              </div>
+            </div>
+
+            <div className="hobby-console-meta" aria-hidden="true">
+              <span>Dolby Digital</span>
+              <span>{selectedScene.label}</span>
+              <span>{String(activeGalleryIndex + 1).padStart(2, '0')}/{String(selectedScene.gallery.length).padStart(2, '0')}</span>
+            </div>
+          </div>
+
+          <div className="hobby-player-gallery">
+            {selectedScene.gallery.map((image, index) => (
+              <button
+                key={`${selectedHobby.title}-${image}`}
+                type="button"
+                className={`hobby-film-thumb ${index === activeGalleryIndex ? 'hobby-film-thumb--active' : ''}`}
+                onClick={() => setActiveGalleryIndex(index)}
+                aria-label={`切换到${selectedHobby.title}图片 ${index + 1}`}
+                aria-pressed={index === activeGalleryIndex}
+              >
+                <img src={image} alt={`${selectedHobby.title}图片 ${index + 1}`} />
+                <span>{String(index + 1).padStart(2, '0')}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="hobby-sticker-row" aria-hidden="true">
+            {selectedScene.stickers.map((sticker) => (
+              <span key={sticker}>{sticker}</span>
+            ))}
+          </div>
+
+          <div className="hobby-control-dock">
+            <div className="hobby-control-cluster" aria-hidden="true">
+              <span className="hobby-control-button" />
+              <span className="hobby-control-button hobby-control-button--wide" />
+              <span className="hobby-control-button" />
+            </div>
+
+            <button
+              type="button"
+              className="hobby-play-button"
+              onClick={() => onPreviewPhoto({ src: activeImage, title: `${selectedHobby.title} 图片 ${activeGalleryIndex + 1}` })}
+              aria-label={`放大播放${selectedHobby.title}`}
+            >
+              <Play size={18} fill="currentColor" />
+              <span>放映</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function HobbiesView() {
   return (
     <div className="grid gap-10 md:grid-cols-2">
@@ -1171,4 +1513,3 @@ function SectionHeader({ title }: { title: string }) {
     </h3>
   );
 }
-

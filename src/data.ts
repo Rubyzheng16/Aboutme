@@ -7,6 +7,11 @@ export interface Project {
   image?: string;
   detailImages?: string[];
   detailIntro?: string;
+  video?: string;
+  techStack?: {
+    title: string;
+    items: string[];
+  };
 }
 
 export interface Experience {
@@ -33,6 +38,7 @@ export interface ResumeData {
   education: Education[];
   experiences: Experience[];
   projects: Project[];
+  moreProjects: Project[];
   skills: {
     frontend: string[];
     backend: string[];
@@ -102,18 +108,56 @@ export const resumeData: ResumeData = {
       ]
     },
     {
-      id: "eagle-drive",
-      title: "Eagle Drive 企业官网",
-      description: "独立负责 News、Products 等核心页面开发，适配 PC/H5 双端，优化加载速度与交互流畅度。",
-      tags: ["Vue.js", "响应式", "性能优化"],
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800"
-    },
-    {
       id: "y-navigation",
       title: "Y-Navigation 行为实验",
       description: "基于 Unity 实现复杂实验流程与交互，支持点数高斯噪声处理及全量数据采集落盘。",
       tags: ["Unity", "C#", "科研实验"],
-      image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?auto=format&fit=crop&q=80&w=800"
+      image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?auto=format&fit=crop&q=80&w=800",
+      video: "/assets/y-navigation-demo.mp4",
+      techStack: {
+        title: "Unity 开发",
+        items: [
+          "独立完成/核心开发：按文献设计实现 Block/Trial 实验流程（16块 × 20次），试次自动切换与实验结束收口。",
+          "搭建 5×5 网格计分与坐标映射，玩家三方向按键移动，四步完成一次试次。",
+          "点数叠加高斯噪声并计算目标偏差奖励，支持 DAS 默认动作序列识别与格子高亮提示。",
+          "UI 实时展示目标/当前分数、步数指示与奖励条。",
+          "采集轨迹、得分、目标、奖励、反应时、超时、Block/Segment 等字段并 CSV 落盘，便于后续统计分析与复现实验结果。"
+        ]
+      }
+    },
+    {
+      id: "born-yesterday",
+      title: "Born Yesterday",
+      description: "IDGA 72 小时极限游戏开发作品。玩家扮演正在经历抉择的仿生人，在有限棋盘上对增值的棋子与空间做取舍。",
+      tags: ["Game Jam", "Unity", "策略解谜", "72h 开发"],
+      link: "https://ldjam.com/events/ludum-dare/58/born-yesterday",
+      video: "/assets/born-yesterday-demo.mp4",
+      techStack: {
+        title: "Born Yesterday",
+        items: [
+          "围绕有限棋盘和不断增值的棋子构建核心机制，让玩家在空间、收益与风险之间持续做取舍。",
+          "以仿生人的身份与规则进行叙事绑定，强调正在发生的自我判断与选择压力。",
+          "在 72 小时内完成玩法原型、关卡节奏、交互反馈与可展示版本打包。"
+        ]
+      }
+    }
+  ],
+  moreProjects: [
+    {
+      id: "cake-game",
+      title: "做蛋糕游戏",
+      description: "粉色厨房风格的小网站游戏，围绕蛋糕装饰与轻量交互做成可直接游玩的网页体验。",
+      tags: ["Web Game", "H5", "可爱交互"],
+      link: "https://cake2-woad.vercel.app/",
+      image: "/assets/cake-game-cover.jpg"
+    },
+    {
+      id: "y2k-tamagotchi",
+      title: "Y2K 拓麻歌子",
+      description: "复古电子宠物网页小游戏，以 Y2K 像素视觉和计时陪伴体验呈现可互动的虚拟宠物。",
+      tags: ["Web Game", "Y2K", "Pixel UI"],
+      link: "https://y2k-coral.vercel.app/",
+      image: "/assets/y2k-tamagotchi-cover.jpg"
     }
   ],
   skills: {
